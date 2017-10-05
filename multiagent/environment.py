@@ -137,8 +137,7 @@ class MultiAgentEnv(gym.Env):
     # set env action for a particular agent
     def _set_action(self, action, agent, action_space, time=None):
         agent.action.u = np.zeros(self.world.dim_p)
-        #agent.action.c = np.zeros(self.world.dim_c)
-        agent.action.c *= self.comm_decay
+        agent.action.c = np.zeros(self.world.dim_c)
         # process action
         if isinstance(action_space, spaces.MultiDiscrete):
             act = []
@@ -170,7 +169,7 @@ class MultiAgentEnv(gym.Env):
                     agent.action.u[1] += action[0][3] - action[0][4]
                 else:
                     agent.action.u = action[0]
-            sensitivity = 5.0 #5.0 #1.0 #0.25
+            sensitivity = 5.0
             if agent.accel is not None:
                 sensitivity = agent.accel
             agent.action.u *= sensitivity

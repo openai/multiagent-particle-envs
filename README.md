@@ -26,7 +26,7 @@ Used in the paper [Multi-Agent Actor-Critic for Mixed Cooperative-Competitive En
 
 - `./multiagent/policy.py`: contains code for interactive policy based on keyboard input.
 
-- `./multiagent/scenario.py`: contains base scenario object that is extended for all scenarios. Also contains base code for the ensemble scenarios.
+- `./multiagent/scenario.py`: contains base scenario object that is extended for all scenarios.
 
 - `./multiagent/scenarios/`: folder where various scenarios/ environments are stored. scenario code consists of several functions:
     1) `make_world()`: creates all of the entities that inhabit the world (landmarks, agents, etc.), assigns their capabilities (whether they can communicate, or move, or both).
@@ -46,9 +46,6 @@ You can create new scenarios by implementing the first 4 functions above (`make_
 
 | Env name in code (name in paper) |  Communication? | Competitive? | Notes |
 | --- | --- | --- | --- |
-| `ensemble_adversary.py` (Physical deception) | N | Y | Same as simple_adversary below, where agents are trained with an ensemble of policies. |
-| `ensemble_push.py` (Keep-away) | N | Y | Same as simple_push below, where agents are trained with an ensemble of policies. |
-| `ensemble_tag.py` (Predator-prey) | N | Y | Same as simple_tag below, where agents are trained with an ensemble of policies. |
 | `simple.py` | N | N | Single agent sees landmark position, rewarded based on how close it gets to landmark. Not a multiagent environment -- used for debugging policies. |
 | `simple_adversary.py` (Physical deception) | N | Y | 1 adversary (red), N good agents (green), N landmarks (usually N=2). All agents observe position of landmarks and other agents. One landmark is the ‘target landmark’ (colored green). Good agents rewarded based on how close one of them is to the target landmark, but negatively rewarded if the adversary is close to target landmark. Adversary is rewarded based on how close it is to the target, but it doesn’t know which landmark is the target landmark. So good agents have to learn to ‘split up’ and cover all landmarks to deceive the adversary. |
 | `simple_crypto.py` (Covert communication) | Y | Y | Two good agents (alice and bob), one adversary (eve). Alice must sent a private message to bob over a public channel. Alice and bob are rewarded based on how well bob reconstructs the message, but negatively rewarded if eve can reconstruct the message. Alice and bob have a private key (randomly generated at beginning of each episode), which they must learn to use to encrypt the message. |
