@@ -12,13 +12,23 @@ Used in the paper [Multi-Agent Actor-Critic for Mixed Cooperative-Competitive En
 
 - Known dependencies: OpenAI gym, numpy, tensorflow
 
+- To use the environments, look at the code for importing them in `make_env.py`.
+
 ## Code structure
 
-- `environment.py`: contains code for environment simulation (interaction physics, `_step()` function, etc.)
+- `make_env.py`: contains code for importing a multiagent environment as an OpenAI Gym-like object.
 
-- `core.py`: contains classes for various objects (Entities, Landmarks, Agents, etc.) that are used throughout the code
+- `./multiagent/environment.py`: contains code for environment simulation (interaction physics, `_step()` function, etc.)
 
-- `/scenarios/`: folder where various scenarios/ environments are stored. scenario code consists of several functions:
+- `./multiagent/core.py`: contains classes for various objects (Entities, Landmarks, Agents, etc.) that are used throughout the code.
+
+- `./multiagent/rendering.py`: used for displaying agent behaviors on the screen.
+
+- `./multiagent/policy.py`: contains code for interactive policy based on keyboard input.
+
+- `./multiagent/scenario.py`: contains base scenario object that is extended for all scenarios. Also contains base code for the ensemble scenarios.
+
+- `./multiagent/scenarios/`: folder where various scenarios/ environments are stored. scenario code consists of several functions:
     1) `make_world()`: creates all of the entities that inhabit the world (landmarks, agents, etc.), assigns their capabilities (whether they can communicate, or move, or both).
      called once at the beginning of each training session
     2) `reset_world()`: resets the world by assigning properties (position, color, etc.) to all entities in the world
@@ -54,21 +64,21 @@ You can create new scenarios by implementing the first 4 functions above (`make_
 If you used this environment for your experiments or found it helpful, consider citing the following papers:
 
 Environments in this repo:
-``
+<pre>
 @article{lowe2017multi,
   title={Multi-Agent Actor-Critic for Mixed Cooperative-Competitive Environments},
   author={Lowe, Ryan and Wu, Yi and Tamar, Aviv and Harb, Jean and Abbeel, Pieter and Mordatch, Igor},
   journal={Neural Information Processing Systems (NIPS)},
   year={2017}
 }
-``
+</pre>
 
 Original particle world environment:
-``
+<pre>
 @article{mordatch2017emergence,
   title={Emergence of Grounded Compositional Language in Multi-Agent Populations},
   author={Mordatch, Igor and Abbeel, Pieter},
   journal={arXiv preprint arXiv:1703.04908},
   year={2017}
 }
-``
+</pre>
