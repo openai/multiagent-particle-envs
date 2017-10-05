@@ -3,7 +3,8 @@ from gym import spaces
 from gym.envs.registration import EnvSpec
 import numpy as np
 import tensorflow as tf
-import ipdb
+
+# TODO: make description of class?
 
 # environment for all agents in the multiagent world
 # TODO: currently code assumes that no agents will be created/destroyed at runtime!
