@@ -13,14 +13,13 @@ class MultiAgentEnv(gym.Env):
     }
 
     def __init__(self, world, reset_callback=None, reward_callback=None,
-                 observation_callback=None, arglist=None, info_callback=None,
+                 observation_callback=None, info_callback=None,
                  shared_viewer=True):
 
         self.world = world
         self.agents = self.world.policy_agents
-        self.arglist = arglist
         # set required vectorized gym env property
-        self.n = len(world.policy_agents)        
+        self.n = len(world.policy_agents)
         # scenario callbacks
         self.reset_callback = reset_callback
         self.reward_callback = reward_callback
@@ -65,18 +64,18 @@ class MultiAgentEnv(gym.Env):
                 self.action_space.append(act_space)
             else:
                 self.action_space.append(total_action_space[0])
-            # observation space 
+            # observation space
             obs_dim = len(observation_callback(agent, self.world))
             self.observation_space.append(spaces.Box(low=-np.inf, high=+np.inf, shape=(obs_dim),))
             agent.action.c = np.zeros(self.world.dim_c)
 
-        
+
         # rendering
         self.shared_viewer = shared_viewer
         if self.shared_viewer:
             self.viewers = [None]
         else:
-            self.viewers = [None] * self.n             
+            self.viewers = [None] * self.n
         self._reset_render()
 
     def _step(self, action_n):
@@ -84,8 +83,6 @@ class MultiAgentEnv(gym.Env):
         reward_n = []
         done_n = []
         info_n = {'n': []}
-        if self.arglist and self.arglist.render_each_step:
-            self._reset_render()
         self.agents = self.world.policy_agents
         # set action for each agent
         for i, agent in enumerate(self.agents):
@@ -149,7 +146,7 @@ class MultiAgentEnv(gym.Env):
             for s in size:
                 act.append(action[index:(index+s)])
                 index += s
-            action = act    
+            action = act
         else:
             action = [action]
 
@@ -187,7 +184,7 @@ class MultiAgentEnv(gym.Env):
         assert len(action) == 0
 
     # reset rendering assets
-    def _reset_render(self): 
+    def _reset_render(self):
         self.render_geoms = None
         self.render_geoms_xform = None
 
@@ -261,7 +258,7 @@ class MultiAgentEnv(gym.Env):
             else:
                 pos = self.agents[i].state.p_pos
             self.viewers[i].set_bounds(pos[0]-cam_range,pos[0]+cam_range,pos[1]-cam_range,pos[1]+cam_range)
-            # update geometry positions                
+            # update geometry positions
             for e, entity in enumerate(self.world.entities):
                 self.render_geoms_xform[e].set_translation(*entity.state.p_pos)
             # render to display or array
@@ -297,13 +294,13 @@ class MultiAgentEnv(gym.Env):
             activations.append(tf.reduce_sum(tf.square(dx_pos), 1, keep_dims=True))
         activations = tf.concat(1, activations)
         #return tf.nn.softmax(-1e+1 * activations)
-        return tf.exp(-activations / 1.0**2)        
+        return tf.exp(-activations / 1.0**2)
 
 # vectorized wrapper for a batch of multi-agent environments
 # assumes all environments have the same observation and action space
 class BatchMultiAgentEnv(gym.Env):
     metadata = {
-        'runtime.vectorized': True,        
+        'runtime.vectorized': True,
         'render.modes' : ['human', 'rgb_array']
     }
 
@@ -320,7 +317,7 @@ class BatchMultiAgentEnv(gym.Env):
 
     @property
     def observation_space(self):
-        return self.env_batch[0].observation_space        
+        return self.env_batch[0].observation_space
 
     def _step(self, action_n, time):
         obs_n = []
@@ -348,4 +345,4 @@ class BatchMultiAgentEnv(gym.Env):
         results_n = []
         for env in self.env_batch:
             results_n += env.render(mode, close)
-        return results_n        
+        return results_n
