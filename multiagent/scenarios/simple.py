@@ -10,7 +10,7 @@ class Scenario(BaseScenario):
         for i, agent in enumerate(world.agents):
             agent.name = 'agent %d' % i
             agent.collide = False
-            agent.silent = True  
+            agent.silent = True
         # add landmarks
         world.landmarks = [Landmark() for i in range(1)]
         for i, landmark in enumerate(world.landmarks):
@@ -24,11 +24,11 @@ class Scenario(BaseScenario):
     def reset_world(self, world):
         # random properties for agents
         for i, agent in enumerate(world.agents):
-            agent.color = np.array([0.25,0.25,0.25])               
+            agent.color = np.array([0.25,0.25,0.25])
         # random properties for landmarks
         for i, landmark in enumerate(world.landmarks):
             landmark.color = np.array([0.75,0.75,0.75])
-        world.landmarks[0].color = np.array([0.75,0.25,0.25])                     
+        world.landmarks[0].color = np.array([0.75,0.25,0.25])
         # set random initial states
         for agent in world.agents:
             agent.state.p_pos = np.random.uniform(-1,+1, world.dim_p)
@@ -42,10 +42,9 @@ class Scenario(BaseScenario):
         dist2 = np.sum(np.square(agent.state.p_pos - world.landmarks[0].state.p_pos))
         return -dist2 #np.exp(-dist2)
 
-    def observation(self, agent, world):        
+    def observation(self, agent, world):
         # get positions of all entities in this agent's reference frame
         entity_pos = []
         for entity in world.landmarks:
             entity_pos.append(entity.state.p_pos - agent.state.p_pos)
         return np.concatenate([agent.state.p_vel] + entity_pos)
-            

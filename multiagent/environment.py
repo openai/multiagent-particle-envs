@@ -70,7 +70,6 @@ class MultiAgentEnv(gym.Env):
             self.observation_space.append(spaces.Box(low=-np.inf, high=+np.inf, shape=(obs_dim),))
             agent.action.c = np.zeros(self.world.dim_c)
 
-
         # rendering
         self.shared_viewer = shared_viewer
         if self.shared_viewer:
@@ -90,7 +89,7 @@ class MultiAgentEnv(gym.Env):
             self._set_action(action_n[i], agent, self.action_space[i])
         # advance world state
         self.world.step()
-        # record observation for each agent  # TODO: clean up
+        # record observation for each agent
         for agent in self.agents:
             obs_n.append(self._get_obs(agent))
             reward_n.append(self._get_reward(agent))
@@ -147,12 +146,13 @@ class MultiAgentEnv(gym.Env):
                 act.append(action[index:(index+s)])
                 index += s
             action = act
-        else:
-            action = [action]
+        #else:
+        #    action = [action]  # TODO: why is this necessary??
 
         if agent.movable:
             # physical action
             if self.discrete_action_input:
+                print(action)
                 agent.action.u = np.zeros(self.world.dim_p)
                 # process discrete action
                 if action[0] == 1: agent.action.u[0] = -1.0
