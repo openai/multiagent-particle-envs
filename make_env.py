@@ -5,6 +5,11 @@ Can be called by using, for example:
     env = make_env('simple_speaker_listener')
 After producing the env object, can be used similarly to an OpenAI gym
 environment.
+
+A policy using this environment must output actions in the form of a list
+for all agents. Each element of the list should be a numpy array,
+of size (env.world.dim_p + env.world.dim_c, 1). Physical actions precede
+communication actions in this array. See environment.py for more details.
 """
 
 def make_env(scenario_name, benchmark=False):
