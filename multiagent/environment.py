@@ -4,10 +4,8 @@ from gym.envs.registration import EnvSpec
 import numpy as np
 import tensorflow as tf
 
-# TODO: make description of class?
-
 # environment for all agents in the multiagent world
-# TODO: currently code assumes that no agents will be created/destroyed at runtime!
+# currently code assumes that no agents will be created/destroyed at runtime!
 class MultiAgentEnv(gym.Env):
     metadata = {
         'render.modes' : ['human', 'rgb_array']
@@ -94,6 +92,7 @@ class MultiAgentEnv(gym.Env):
             obs_n.append(self._get_obs(agent))
             reward_n.append(self._get_reward(agent))
             done_n.append(False)
+
             info_n['n'].append(self._get_info(agent))
 
         # all agents get total reward in cooperative case
@@ -146,13 +145,12 @@ class MultiAgentEnv(gym.Env):
                 act.append(action[index:(index+s)])
                 index += s
             action = act
-        #else:
-        #    action = [action]  # TODO: why is this necessary??
+        else:
+            action = [action]  # TODO: why is this necessary??
 
         if agent.movable:
             # physical action
             if self.discrete_action_input:
-                print(action)
                 agent.action.u = np.zeros(self.world.dim_p)
                 # process discrete action
                 if action[0] == 1: agent.action.u[0] = -1.0
@@ -190,7 +188,6 @@ class MultiAgentEnv(gym.Env):
 
     # render environment
     def _render(self, mode='human', close=True):
-        # TODO: render text in viewer instead
         if mode == 'human':
             alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
             message = ''
@@ -231,10 +228,7 @@ class MultiAgentEnv(gym.Env):
             for entity in self.world.entities:
                 geom = rendering.make_circle(entity.size)
                 xform = rendering.Transform()
-                if 'forest' in entity.name:
-                    print(entity.color)
-                    geom.set_color(*entity.color, alpha=0.5)
-                elif 'agent' in entity.name:
+                if 'agent' in entity.name:
                     geom.set_color(*entity.color, alpha=0.5)
                 else:
                     geom.set_color(*entity.color)
@@ -252,7 +246,7 @@ class MultiAgentEnv(gym.Env):
         for i in range(len(self.viewers)):
             from multiagent import rendering
             # update bounds to center around agent
-            cam_range = 1.2
+            cam_range = 1
             if self.shared_viewer:
                 pos = np.zeros(self.world.dim_p)
             else:

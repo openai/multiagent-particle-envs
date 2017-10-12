@@ -29,15 +29,20 @@ class InteractivePolicy(Policy):
             if self.move[2]: u = 4
             if self.move[3]: u = 3
         else:
-            u = np.array([0.0,0.0,0.0,0.0])
-            if self.move[0]: u[0] += 1.0
-            if self.move[1]: u[1] += 1.0
-            if self.move[2]: u[2] += 1.0
+            u = np.array([0.0,0.0,0.0,0.0,0.0]) # 5-d because of no-move action
+            if self.move[0]: u[1] += 1.0
+            if self.move[1]: u[2] += 1.0
             if self.move[3]: u[3] += 1.0
-        c = 0
-        for i in range(len(self.comm)):
-            if self.comm[i]: c = i+1
-        return [u, c]
+            if self.move[2]: u[4] += 1.0
+            if True not in self.move:
+                u[0] += 1.0
+        if self.env.world.dim_c == 0:
+            return u
+        else:
+            c = 0
+            for i in range(len(self.comm)):
+                if self.comm[i]: c = i+1
+            return [u, c]
 
     # keyborad event callbacks
     def key_press(self, k, mod):
