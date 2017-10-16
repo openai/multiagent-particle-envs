@@ -2,7 +2,6 @@ import gym
 from gym import spaces
 from gym.envs.registration import EnvSpec
 import numpy as np
-import tensorflow as tf
 
 # environment for all agents in the multiagent world
 # currently code assumes that no agents will be created/destroyed at runtime!
@@ -281,15 +280,6 @@ class MultiAgentEnv(gym.Env):
                     dx.append(np.array([x,y]))
         return dx
 
-    # construct receptive field activations for 'other' relative to root
-    def _get_receptor_activations(self, entity_root, state_root, other_x_pos):
-        activations = []
-        for dx in self.receptor_locations:
-            dx_pos = state_root.x_pos + dx - other_x_pos
-            activations.append(tf.reduce_sum(tf.square(dx_pos), 1, keep_dims=True))
-        activations = tf.concat(1, activations)
-        #return tf.nn.softmax(-1e+1 * activations)
-        return tf.exp(-activations / 1.0**2)
 
 # vectorized wrapper for a batch of multi-agent environments
 # assumes all environments have the same observation and action space
