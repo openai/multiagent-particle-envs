@@ -145,7 +145,6 @@ class MultiAgentEnv(gym.Env):
                 index += s
             action = act
         else:
-            import ipdb; ipdb.set_trace()
             action = [action]
 
         if agent.movable:
