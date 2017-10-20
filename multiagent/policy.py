@@ -37,7 +37,7 @@ class InteractivePolicy(Policy):
             if self.move[2]: u[4] += 1.0
             if True not in self.move:
                 u[0] += 1.0
-        return np.concatenate([u. np.zeros(envo.world.dim_c)])
+        return np.concatenate([u, np.zeros(self.env.world.dim_c)])
 
     # keyboard event callbacks
     def key_press(self, k, mod):
