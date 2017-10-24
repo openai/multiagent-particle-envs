@@ -8,6 +8,15 @@ class Policy(object):
     def action(self, obs):
         raise NotImplementedError()
 
+class RandomPolicy(Policy):
+    def __init__(self, env, agent_index):
+        super(RandomPolicy, self).__init__()
+        self.env = env
+    def action(self, obs):
+        a = np.eye(self.env.action_space[0].n)[self.env.action_space[0].sample()]
+        p = np.concatenate([a, np.zeros(self.env.world.dim_c)])
+        return p
+
 # interactive policy based on keyboard input
 # hard-coded to deal only with movement, not communication
 class InteractivePolicy(Policy):

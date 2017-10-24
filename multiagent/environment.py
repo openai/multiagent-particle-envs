@@ -129,7 +129,7 @@ class MultiAgentEnv(gym.Env):
     def _get_reward(self, agent):
         if self.reward_callback is None:
             return 0.0
-        self.reward_callback(agent, self.world)
+        return self.reward_callback(agent, self.world)
 
     # set env action for a particular agent
     def _set_action(self, action, agent, action_space, time=None):
