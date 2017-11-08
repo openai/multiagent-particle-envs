@@ -12,7 +12,7 @@ class MultiAgentEnv(gym.Env):
 
     def __init__(self, world, reset_callback=None, reward_callback=None,
                  observation_callback=None, info_callback=None,
-                 shared_viewer=True):
+                 done_callback=None, shared_viewer=True):
 
         self.world = world
         self.agents = self.world.policy_agents
@@ -23,6 +23,7 @@ class MultiAgentEnv(gym.Env):
         self.reward_callback = reward_callback
         self.observation_callback = observation_callback
         self.info_callback = info_callback
+        self.done_callback = done_callback
         # environment parameters
         self.discrete_action_space = True
         # if true, action is a number 0...N, otherwise action is a one-hot N-dimensional vector
@@ -90,7 +91,7 @@ class MultiAgentEnv(gym.Env):
         for agent in self.agents:
             obs_n.append(self._get_obs(agent))
             reward_n.append(self._get_reward(agent))
-            done_n.append(False)
+            done_n.append(self._get_done(agent))
 
             info_n['n'].append(self._get_info(agent))
 
@@ -123,6 +124,12 @@ class MultiAgentEnv(gym.Env):
     def _get_obs(self, agent):
         if self.observation_callback is None:
             return np.zeros(0)
+        return self.observation_callback(agent, self.world)
+
+    # get dones for a particular agent
+    def _get_done(self, agent):
+        if self.done_callback is None:
+            return False
         return self.observation_callback(agent, self.world)
 
     # get reward for a particular agent
