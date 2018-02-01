@@ -52,7 +52,7 @@ class Scenario(BaseScenario):
                 agent.color = np.array([0.75, 0.25, 0.25])
             agent.key = None
         # random properties for landmarks
-        color_list = [np.zeros(3) for i in world.landmarks]
+        color_list = [np.zeros(world.dim_c) for i in world.landmarks]
         for i, color in enumerate(color_list):
             color[i] += 1
         for color, landmark in zip(color_list, world.landmarks):
@@ -169,5 +169,3 @@ class Scenario(BaseScenario):
                 print(agent.state.c)
                 print(np.concatenate(comm + [confer]))
             return np.concatenate(comm)
-
-
