@@ -127,10 +127,11 @@ class MultiAgentEnv(gym.Env):
         return self.observation_callback(agent, self.world)
 
     # get dones for a particular agent
+    # unused right now -- agents are allowed to go beyond the viewing screen
     def _get_done(self, agent):
         if self.done_callback is None:
             return False
-        return self.observation_callback(agent, self.world)
+        return self.done_callback(agent, self.world)
 
     # get reward for a particular agent
     def _get_reward(self, agent):
