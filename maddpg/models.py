@@ -18,13 +18,10 @@ class Actor(nn.Module):
 
 
 class Critic(nn.Module):
-    def __init__(self, n_agent, dim_observation, dim_action):
+    def __init__(self, dim_observation, dim_action):
         super(Critic, self).__init__()
-        obs_dim = dim_observation * n_agent
-        act_dim = dim_action * n_agent
-
-        self.FC1 = nn.Linear(obs_dim, 64)       # nn.Linear(obs_dim+act_dim, 64)
-        self.FC2 = nn.Linear(64+act_dim, 64)
+        self.FC1 = nn.Linear(dim_observation, 64)       # nn.Linear(obs_dim+act_dim, 64)
+        self.FC2 = nn.Linear(64+dim_action, 64)
         self.FC3 = nn.Linear(64, 1)
 
     def forward(self, obs, acts):

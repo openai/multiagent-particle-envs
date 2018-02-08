@@ -6,7 +6,7 @@ env = make_env('simple_speaker_listener')
 
 for i_episode in range(1):
     observation = env.reset()
-    for t in range(100):
+    for t in range(2):
         env.render()
         agent_actions = []
         for i, agent in enumerate(env.world.agents):
@@ -19,6 +19,7 @@ for i_episode in range(1):
         time.sleep(0.033)
         observation, reward, done, info = env.step(agent_actions)
 
+        print(agent_actions)
         print(observation)
         print(reward)
         print(done)
