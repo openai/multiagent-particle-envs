@@ -9,4 +9,5 @@
 
 __pycache__/
 *.egg-info/
-
+*.json
+*runs

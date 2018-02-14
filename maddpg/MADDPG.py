@@ -102,13 +102,17 @@ class MADDPG:
             # print('state.actions', batch.actions)
             # print('state.next_states', batch.next_states)
             non_final_mask = ByteTensor(list(map(lambda s: s is not None, batch.next_states)))
+            # print('shape of non_final_mask', non_final_mask.size())
             # print('non_final_mask', non_final_mask)
             # state_batch: batch_size x dim_obs_sum
             state_batch = Variable(th.stack(batch.states).type(FloatTensor))
+            # print('shape of state_batch', state_batch.size())
             # print('state_batch', state_batch)
             action_batch = Variable(th.stack(batch.actions).type(FloatTensor))
+            # print('shape of action_batch', action_batch.size())
             # print('state_actions', action_batch)
             reward_batch = Variable(th.stack(batch.rewards).type(FloatTensor))
+            # print('shape of reward_batch', reward_batch.size())
             # print('state_rewards', reward_batch)
             # batch_size_non_final x dim_obs_sum
             # non_final_next_states = Variable(th.from_numpy(np.array([s for s in batch.next_states if s is not None])))
@@ -118,6 +122,7 @@ class MADDPG:
 
             # for current agent
             whole_state = state_batch.view(self.batch_size, -1)
+            # print('shape of whole_state', whole_state.size())
             whole_action = action_batch.view(self.batch_size, -1)
 
             # critic network
@@ -147,14 +152,14 @@ class MADDPG:
             # actor network
             self.actor_optimizer[agent].zero_grad()
             state_i = state_batch[:, index_obs:(index_obs+self.dim_obs_list[agent])]
-            index_obs = self.dim_obs_list[agent]
+            index_obs += self.dim_obs_list[agent]
             # print('index_obs', index_obs)
             action_i = self.actors[agent](state_i)
             ac = action_batch.clone()
             # print('action_i', action_i)
             # print('ac', ac)
             ac[:, index_act:(index_act+self.dim_act_list[agent])] = action_i
-            index_act = self.dim_act_list[agent]
+            index_act += self.dim_act_list[agent]
             # print('index_act', index_act)
             whole_action = ac.view(self.batch_size, -1)
             actor_loss = -self.critics[agent](whole_state, whole_action)
@@ -208,8 +213,8 @@ class MADDPG:
             actions[:, index_act:(index_act+self.dim_act_list[i])] = act
             # print('actions', actions)
 
-            index_obs = self.dim_obs_list[i]
-            index_act = self.dim_act_list[i]
+            index_obs += self.dim_obs_list[i]
+            index_act += self.dim_act_list[i]
 
         self.steps_done += 1
 

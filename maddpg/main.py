@@ -13,12 +13,12 @@ n_agents = len(env.world.agents)
 dim_obs_list = [env.observation_space[i].shape[0] for i in range(n_agents)]
 dim_act_list = [env.action_space[i].n for i in range(n_agents)]
 
-capacity = 10000
-batch_size = 5
+capacity = 1000000
+batch_size = 1000
 
-n_episode = 100   # 20000
-max_steps = 5   # 1000
-episodes_before_train = 5
+n_episode = 2000    # 20000
+max_steps = 1000    # 1000
+episodes_before_train = 100     # 100
 
 reward_record = []
 
@@ -26,7 +26,10 @@ maddpg = MADDPG(n_agents, dim_obs_list, dim_act_list, batch_size, capacity, epis
 
 FloatTensor = th.cuda.FloatTensor if maddpg.use_cuda else th.FloatTensor
 
+writer = SummaryWriter()
+
 for i_episode in range(n_episode):
+    print('episode', i_episode)
     obs = env.reset()
     # obs = [obs[i] for i in range(n_agents)]
     obs = np.concatenate(obs, 0)
@@ -37,7 +40,7 @@ for i_episode in range(n_episode):
     av_actors_grad = np.zeros((n_agents, 6))
     n = 0
     for t in range(max_steps):
-        print(t)
+        # print(t)
         env.render()
 
         # obs turns to Variable before feed into Actor
@@ -79,7 +82,7 @@ for i_episode in range(n_episode):
             av_actors_grad += np.array(actors_grad)
             n += 1
 
-        time.sleep(0.1)
+        time.sleep(0.05)
 
     if n != 0:
         av_critics_grad = av_critics_grad / n
@@ -88,6 +91,13 @@ for i_episode in range(n_episode):
     maddpg.episode_done += 1
     print('Episode: %d, reward = %f' % (i_episode, total_reward))
     reward_record.append(total_reward)
+
+    writer.add_scalar('data/scalar1', total_reward, i_episode)
+
+# print('reward_record', reward_record)
+
+writer.export_scalars_to_json("./all_scalars.json")
+writer.close()
 
 
 
