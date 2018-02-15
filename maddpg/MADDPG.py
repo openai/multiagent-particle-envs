@@ -142,6 +142,7 @@ class MADDPG:
                 non_final_next_actions.view(-1, self.dim_act_sum)
             )
 
+            # here target_Q is y_i of TD error equation
             target_Q = (target_Q * self.GAMMA) + (reward_batch[:, agent] * self.scale_reward)
 
             loss_Q = nn.MSELoss()(current_Q, target_Q.detach())

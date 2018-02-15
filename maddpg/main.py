@@ -30,6 +30,7 @@ writer = SummaryWriter()
 
 for i_episode in range(n_episode):
     print('episode', i_episode)
+    print('Target landmark for agent 1: ', env.world.agents[0].goal_b.name)
     obs = env.reset()
     # obs = [obs[i] for i in range(n_agents)]
     obs = np.concatenate(obs, 0)
@@ -82,7 +83,7 @@ for i_episode in range(n_episode):
             av_actors_grad += np.array(actors_grad)
             n += 1
 
-        time.sleep(0.05)
+        # time.sleep(0.05)
 
     if n != 0:
         av_critics_grad = av_critics_grad / n
