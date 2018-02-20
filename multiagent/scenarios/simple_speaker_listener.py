@@ -63,8 +63,8 @@ class Scenario(BaseScenario):
         # squared distance from listener to landmark
         a = world.agents[0]
         dist2 = np.sum(np.square(a.goal_a.state.p_pos - a.goal_b.state.p_pos))
-        # return -dist2
-        return 1 / dist2
+        return -dist2
+        # return 1 / dist2
 
     def observation(self, agent, world):
         # goal color

@@ -14,13 +14,18 @@ dim_obs_list = [env.observation_space[i].shape[0] for i in range(n_agents)]
 dim_act_list = [env.action_space[i].n for i in range(n_agents)]
 
 capacity = 1000000
-batch_size = 1000
+capacity = 1000000
+batch_size = 1024
 
-n_episode = 2000    # 20000
+n_episode = 25000    # 20000
 max_steps = 1000    # 1000
-episodes_before_train = 100     # 100
+episodes_before_train = 100     # 50 ? Not specified in paper
 
 reward_record = []
+
+snapshot_path = "/home/jadeng/Documents/snapshot/"
+snapshot_name = "speaker_listener_latest_episode_"
+path = snapshot_path + snapshot_name + '800'
 
 maddpg = MADDPG(n_agents, dim_obs_list, dim_act_list, batch_size, capacity, episodes_before_train, load_models=None)
 
@@ -29,10 +34,10 @@ FloatTensor = th.cuda.FloatTensor if maddpg.use_cuda else th.FloatTensor
 writer = SummaryWriter()
 
 for i_episode in range(n_episode):
-    print('episode', i_episode)
-    print('Target landmark for agent 1: ', env.world.agents[0].goal_b.name)
     obs = env.reset()
     # obs = [obs[i] for i in range(n_agents)]
+    # import pdb
+    # pdb.set_trace()
     obs = np.concatenate(obs, 0)
     if isinstance(obs, np.ndarray):
         obs = th.from_numpy(obs).float()    # obs in Tensor now
@@ -40,6 +45,9 @@ for i_episode in range(n_episode):
     av_critics_grad = np.zeros((n_agents, 6))
     av_actors_grad = np.zeros((n_agents, 6))
     n = 0
+    print('Start of episode', i_episode)
+    print('Target landmark for agent 1: ', env.world.agents[0].goal_b.name)
+    print('Target landmark color: ', env.world.agents[0].goal_b.color)
     for t in range(max_steps):
         # print(t)
         env.render()
@@ -90,10 +98,41 @@ for i_episode in range(n_episode):
         av_actors_grad = av_actors_grad / n
 
     maddpg.episode_done += 1
-    print('Episode: %d, reward = %f' % (i_episode, total_reward))
+    mean_reward = total_reward / 1000
+    print('End of Episode: %d, reward = %f' % (i_episode, mean_reward))
     reward_record.append(total_reward)
 
-    writer.add_scalar('data/scalar1', total_reward, i_episode)
+    # plot of reward
+    writer.add_scalar('data/reward', total_reward, i_episode)
+
+    # plot of agent0 - speaker gradient of critic net
+    for i in range(6):
+        writer.add_scalar('data/speaker_critic_gradient', av_critics_grad[0][i], i_episode)
+
+    # plot of agent0 - speaker gradient of actor net
+    for i in range(6):
+        writer.add_scalar('data/speaker_actor_gradient', av_actors_grad[0][i], i_episode)
+
+    # plot of agent1 - listener gradient of critics net
+    for i in range(6):
+        writer.add_scalar('data/listener_critic_gradient', av_critics_grad[1][i], i_episode)
+
+    # plot of agent0 - speaker gradient of critics net
+    for i in range(6):
+        writer.add_scalar('data/listener_actor_gradient', av_actors_grad[1][i], i_episode)
+
+    # to save models every 200 episodes
+    if i_episode != 0 and i_episode % 200 == 0:
+        print('Save models!')
+        states = {'critics': maddpg.critics,
+                  'actors': maddpg.actors,
+                  'critic_optimizer': maddpg.critic_optimizer,
+                  'actor_optimizer': maddpg.actor_optimizer,
+                  'critics_target': maddpg.critics_target,
+                  'actors_target': maddpg.actors_target,
+                  'memory': maddpg.memory,
+                  'var': maddpg.var}
+        th.save(states, snapshot_path + snapshot_name + str(i_episode))
 
 # print('reward_record', reward_record)
 

@@ -36,15 +36,15 @@ class MADDPG:
             self.critics = [Critic(dim_obs_sum, dim_act_sum) for i in range(n_agents)]
             self.actors_target = deepcopy(self.actors)
             self.critics_target = deepcopy(self.critics)
-            self.critic_optimizer = [Adam(x.parameters(), lr=0.0001) for x in self.critics]
-            self.actor_optimizer = [Adam(x.parameters(), lr=0.00001) for x in self.actors]
+            self.critic_optimizer = [Adam(x.parameters(), lr=0.01) for x in self.critics]     # 0.0001
+            self.actor_optimizer = [Adam(x.parameters(), lr=0.01) for x in self.actors]      # 0.00001
             self.memory = ReplayMemory(capacity)
             self.var = [1.0 for i in range(n_agents)]
         else:
             print('Start loading models!')
             states = th.load(load_models)
-            self.actors = states['actors']
             self.critics = states['critics']
+            self.actors = states['actors']
             self.critic_optimizer = states['critic_optimizer']
             self.actor_optimizer = states['actor_optimizer']
             self.critics_target = states['critics_target']
@@ -61,6 +61,7 @@ class MADDPG:
         self.dim_act_sum = dim_act_sum
         self.use_cuda = th.cuda.is_available()
         self.episodes_before_train = episodes_before_train
+        self.clip = None    # 10
 
         self.GAMMA = 0.95
         self.tau = 0.01
@@ -148,6 +149,8 @@ class MADDPG:
             loss_Q = nn.MSELoss()(current_Q, target_Q.detach())
             loss_Q.backward()
 
+            if self.clip is not None:
+                nn.utils.clip_grad_norm(self.critics[agent].parameters(), self.clip)
             self.critic_optimizer[agent].step()
 
             # actor network
@@ -166,6 +169,9 @@ class MADDPG:
             actor_loss = -self.critics[agent](whole_state, whole_action)
             actor_loss = actor_loss.mean()
             actor_loss.backward()
+
+            if self.clip is not None:
+                nn.utils.clip_grad_norm(self.actors[agent].parameters(), self.clip)
             self.actor_optimizer[agent].step()
 
             c_loss.append(loss_Q)
