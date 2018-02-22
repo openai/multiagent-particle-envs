@@ -36,8 +36,8 @@ class MADDPG:
             self.critics = [Critic(dim_obs_sum, dim_act_sum) for i in range(n_agents)]
             self.actors_target = deepcopy(self.actors)
             self.critics_target = deepcopy(self.critics)
-            self.critic_optimizer = [Adam(x.parameters(), lr=0.01) for x in self.critics]     # 0.0001
-            self.actor_optimizer = [Adam(x.parameters(), lr=0.01) for x in self.actors]      # 0.00001
+            self.critic_optimizer = [Adam(x.parameters(), lr=0.001) for x in self.critics]     # 0.0001
+            self.actor_optimizer = [Adam(x.parameters(), lr=0.001) for x in self.actors]      # 0.00001
             self.memory = ReplayMemory(capacity)
             self.var = [1.0 for i in range(n_agents)]
         else:
@@ -61,7 +61,7 @@ class MADDPG:
         self.dim_act_sum = dim_act_sum
         self.use_cuda = th.cuda.is_available()
         self.episodes_before_train = episodes_before_train
-        self.clip = None    # 10
+        self.clip = 1500.0    # 10
 
         self.GAMMA = 0.95
         self.tau = 0.01
@@ -196,7 +196,7 @@ class MADDPG:
 
         return critics_grad, actors_grad
 
-    def select_action(self, state_batch):
+    def select_action(self, state_batch):   # no batch here!! Just concatenation of observations from agents
         # state_batch: batch_size x dim_state_sum
         actions = Variable(th.zeros(1, self.dim_act_sum))
         FloatTensor = th.cuda.FloatTensor if self.use_cuda else th.FloatTensor

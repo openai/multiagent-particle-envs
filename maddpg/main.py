@@ -14,14 +14,13 @@ dim_obs_list = [env.observation_space[i].shape[0] for i in range(n_agents)]
 dim_act_list = [env.action_space[i].n for i in range(n_agents)]
 
 capacity = 1000000
-capacity = 1000000
 batch_size = 1024
 
 n_episode = 25000    # 20000
-max_steps = 1000    # 1000
-episodes_before_train = 100     # 50 ? Not specified in paper
+max_steps = 500    # 1000
+episodes_before_train = 50     # 50 ? Not specified in paper
 
-reward_record = []
+# reward_record = []
 
 snapshot_path = "/home/jadeng/Documents/snapshot/"
 snapshot_name = "speaker_listener_latest_episode_"
@@ -56,7 +55,8 @@ for i_episode in range(n_episode):
         obs = Variable(obs).type(FloatTensor)
         # print('obs', obs)
 
-        action = maddpg.select_action(obs).data.cpu()
+        action = maddpg.select_action(obs).data.cpu()   # actions in Variable
+        # convert action from Variable to list
         action = [action[0].numpy()[:dim_act_list[0]], action[0].numpy()[dim_act_list[0]:]]
         obs_, reward, done, _ = env.step(action)
 
@@ -98,12 +98,12 @@ for i_episode in range(n_episode):
         av_actors_grad = av_actors_grad / n
 
     maddpg.episode_done += 1
-    mean_reward = total_reward / 1000
-    print('End of Episode: %d, reward = %f' % (i_episode, mean_reward))
-    reward_record.append(total_reward)
+    mean_reward = total_reward / max_steps
+    print('End of Episode: %d, mean_reward = %f, total_reward = %f' % (i_episode, mean_reward, total_reward))
+    # reward_record.append(total_reward)
 
     # plot of reward
-    writer.add_scalar('data/reward', total_reward, i_episode)
+    writer.add_scalar('data/reward', mean_reward, i_episode)
 
     # plot of agent0 - speaker gradient of critic net
     for i in range(6):

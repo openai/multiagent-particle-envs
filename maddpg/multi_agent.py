@@ -16,6 +16,8 @@ for i_episode in range(1):
             action_vec[action] = 1
             agent_actions.append(action_vec)
 
+        import pdb
+        pdb.set_trace()
         time.sleep(0.033)
         observation, reward, done, info = env.step(agent_actions)
 
