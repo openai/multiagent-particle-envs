@@ -10,7 +10,7 @@ Used in the paper [Multi-Agent Actor-Critic for Mixed Cooperative-Competitive En
 - To interactively view moving to landmark scenario (see others in ./scenarios/):
 `bin/interactive.py --scenario simple.py`
 
-- Known dependencies: OpenAI gym, numpy
+- Known dependencies: OpenAI gym version >=0.10, numpy
 
 - To use the environments, look at the code for importing them in `make_env.py`.
 

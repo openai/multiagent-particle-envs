@@ -43,14 +43,14 @@ class MultiAgentEnv(gym.Env):
             if self.discrete_action_space:
                 u_action_space = spaces.Discrete(world.dim_p * 2 + 1)
             else:
-                u_action_space = spaces.Box(low=-agent.u_range, high=+agent.u_range, shape=(world.dim_p,))
+                u_action_space = spaces.Box(low=-agent.u_range, high=+agent.u_range, shape=(world.dim_p,), dtype=np.float32)
             if agent.movable:
                 total_action_space.append(u_action_space)
             # communication action space
             if self.discrete_action_space:
                 c_action_space = spaces.Discrete(world.dim_c)
             else:
-                c_action_space = spaces.Box(low=0.0, high=1.0, shape=(world.dim_c,))
+                c_action_space = spaces.Box(low=0.0, high=1.0, shape=(world.dim_c,), dtype=np.float32)
             if not agent.silent:
                 total_action_space.append(c_action_space)
             # total action space
@@ -65,7 +65,7 @@ class MultiAgentEnv(gym.Env):
                 self.action_space.append(total_action_space[0])
             # observation space
             obs_dim = len(observation_callback(agent, self.world))
-            self.observation_space.append(spaces.Box(low=-np.inf, high=+np.inf, shape=(obs_dim,)))
+            self.observation_space.append(spaces.Box(low=-np.inf, high=+np.inf, shape=(obs_dim,), dtype=np.float32))
             agent.action.c = np.zeros(self.world.dim_c)
 
         # rendering
@@ -76,7 +76,7 @@ class MultiAgentEnv(gym.Env):
             self.viewers = [None] * self.n
         self._reset_render()
 
-    def _step(self, action_n):
+    def step(self, action_n):
         obs_n = []
         reward_n = []
         done_n = []
@@ -102,7 +102,7 @@ class MultiAgentEnv(gym.Env):
 
         return obs_n, reward_n, done_n, info_n
 
-    def _reset(self):
+    def reset(self):
         # reset world
         self.reset_callback(self.world)
         # reset renderer
@@ -196,7 +196,7 @@ class MultiAgentEnv(gym.Env):
         self.render_geoms_xform = None
 
     # render environment
-    def _render(self, mode='human', close=True):
+    def render(self, mode='human'):
         if mode == 'human':
             alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
             message = ''
@@ -210,14 +210,6 @@ class MultiAgentEnv(gym.Env):
                         word = alphabet[np.argmax(other.state.c)]
                     message += (other.name + ' to ' + agent.name + ': ' + word + '   ')
             print(message)
-
-        if close:
-            # close any existic renderers
-            for i,viewer in enumerate(self.viewers):
-                if viewer is not None:
-                    viewer.close()
-                self.viewers[i] = None
-            return []
 
         for i in range(len(self.viewers)):
             # create viewers (if necessary)
@@ -313,7 +305,7 @@ class BatchMultiAgentEnv(gym.Env):
     def observation_space(self):
         return self.env_batch[0].observation_space
 
-    def _step(self, action_n, time):
+    def step(self, action_n, time):
         obs_n = []
         reward_n = []
         done_n = []
@@ -328,14 +320,14 @@ class BatchMultiAgentEnv(gym.Env):
             done_n += done
         return obs_n, reward_n, done_n, info_n
 
-    def _reset(self):
+    def reset(self):
         obs_n = []
         for env in self.env_batch:
             obs_n += env.reset()
         return obs_n
 
     # render environment
-    def _render(self, mode='human', close=True):
+    def render(self, mode='human', close=True):
         results_n = []
         for env in self.env_batch:
             results_n += env.render(mode, close)
