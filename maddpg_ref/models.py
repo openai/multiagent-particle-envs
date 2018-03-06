@@ -20,8 +20,10 @@ class Actor(nn.Module):
 class Critic(nn.Module):
     def __init__(self, dim_observation, dim_action):
         super(Critic, self).__init__()
-        self.FC1 = nn.Linear(dim_observation, 64)       # nn.Linear(obs_dim+act_dim, 64)
-        self.FC2 = nn.Linear(64+dim_action, 64)
+        # self.FC1 = nn.Linear(dim_observation, 64)       # nn.Linear(obs_dim+act_dim, 64)
+        # self.FC2 = nn.Linear(64+dim_action, 64)
+        self.FC1 = nn.Linear(dim_observation + dim_action, 64)  # nn.Linear(obs_dim+act_dim, 64)
+        self.FC2 = nn.Linear(64, 64)
         self.FC3 = nn.Linear(64, 1)
 
     def forward(self, obs, acts):

@@ -135,6 +135,7 @@ class MADDPG:
             for i in range(self.n_agents):
                 at = self.actors_target[i](non_final_next_states[:, idx:(idx+self.dim_obs_list[i])])
                 non_final_next_actions.append(at)
+                idx += self.dim_obs_list[i]
             non_final_next_actions = th.cat((non_final_next_actions[0], non_final_next_actions[1]), 1)
 
             target_Q = Variable(th.zeros(self.batch_size).type(FloatTensor))

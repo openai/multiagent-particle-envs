@@ -37,6 +37,7 @@ class Scenario(BaseScenario):
         # want listener to go to the goal landmark
         world.agents[0].goal_a = world.agents[1]
         world.agents[0].goal_b = np.random.choice(world.landmarks)
+        # world.agents[0].goal_b = world.landmarks[0]
         # random properties for agents
         for i, agent in enumerate(world.agents):
             agent.color = np.array([0.25,0.25,0.25])               

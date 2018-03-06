@@ -19,6 +19,7 @@ batch_size = 1024
 n_episode = 25000    # 20000
 max_steps = 250    # 1000
 episodes_before_train = 50     # 50 ? Not specified in paper
+episodes_to_break = 500
 
 # reward_record = []
 
@@ -73,7 +74,10 @@ for i_episode in range(n_episode):
             next_obs = obs_
         else:
             next_obs = None
-
+        '''
+        if i_episode >= episodes_to_break and reward.sum() > 5.0:
+            break
+        '''
         total_reward += reward.sum()
 
         maddpg.memory.push(obs.data, action, next_obs, reward)  # tensors
@@ -99,6 +103,15 @@ for i_episode in range(n_episode):
 
     maddpg.episode_done += 1
     mean_reward = total_reward / max_steps
+    '''
+    import pdb
+    pdb.set_trace()
+    if i_episode >= episodes_to_break and n < max_steps:
+        mean_reward = total_reward / n
+    else:
+        mean_reward = total_reward / max_steps
+    '''
+
     print('End of Episode: %d, mean_reward = %f, total_reward = %f' % (i_episode, mean_reward, total_reward))
     # reward_record.append(total_reward)
 

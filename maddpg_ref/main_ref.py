@@ -1,5 +1,6 @@
 from torch.autograd import Variable
 from make_env import make_env
+from gym import spaces
 from MADDPG import MADDPG
 import numpy as np
 import torch as th
@@ -8,10 +9,19 @@ import torchvision.utils as vutils
 import time
 
 
-env = make_env('simple_speaker_listener')
+env = make_env('simple_reference')
 n_agents = len(env.world.agents)
 dim_obs_list = [env.observation_space[i].shape[0] for i in range(n_agents)]
-dim_act_list = [env.action_space[i].n for i in range(n_agents)]
+
+dim_act_list = []
+for i in range(n_agents):
+    if isinstance(env.action_space[i], spaces.MultiDiscrete):
+        size = env.action_space[i].high - env.action_space[i].low + 1
+        dim_act_list.append(sum(size))
+    elif isinstance(env.action_space[i], spaces.Discrete):
+        dim_act_list.append(env.action_space[i].n)
+    else:
+        print(env.action_space[i])
 
 capacity = 1000000
 batch_size = 1024
@@ -23,7 +33,7 @@ episodes_before_train = 50     # 50 ? Not specified in paper
 # reward_record = []
 
 snapshot_path = "/home/jadeng/Documents/snapshot/"
-snapshot_name = "speaker_listener_latest_episode_"
+snapshot_name = "reference_latest_episode_"
 path = snapshot_path + snapshot_name + '800'
 
 maddpg = MADDPG(n_agents, dim_obs_list, dim_act_list, batch_size, capacity, episodes_before_train, load_models=None)
@@ -44,6 +54,7 @@ for i_episode in range(n_episode):
     av_critics_grad = np.zeros((n_agents, 6))
     av_actors_grad = np.zeros((n_agents, 6))
     n = 0
+    print('Simple Reference')
     print('Start of episode', i_episode)
     print('Target landmark for agent 1: ', env.world.agents[0].goal_b.name)
     print('Target landmark color: ', env.world.agents[0].goal_b.color)
@@ -51,12 +62,12 @@ for i_episode in range(n_episode):
         # print(t)
         env.render()
 
-        # obs turns to Variable before feed into Actor
+        # obs Tensor turns into Variable before feed into Actor
         obs = Variable(obs).type(FloatTensor)
         # print('obs', obs)
 
         action = maddpg.select_action(obs).data.cpu()   # actions in Variable
-        # convert action from Variable to list
+        # convert action from Variable to list, hard code here
         action = [action[0].numpy()[:dim_act_list[0]], action[0].numpy()[dim_act_list[0]:]]
         obs_, reward, done, _ = env.step(action)
 
