@@ -36,8 +36,8 @@ class MADDPG:
             self.critics = [Critic(dim_obs_sum, dim_act_sum) for i in range(n_agents)]
             self.actors_target = deepcopy(self.actors)
             self.critics_target = deepcopy(self.critics)
-            self.critic_optimizer = [Adam(x.parameters(), lr=0.005) for x in self.critics]     # 0.0001
-            self.actor_optimizer = [Adam(x.parameters(), lr=0.005) for x in self.actors]      # 0.00001
+            self.critic_optimizer = [Adam(x.parameters(), lr=0.005) for x in self.critics]     # 0.01
+            self.actor_optimizer = [Adam(x.parameters(), lr=0.005) for x in self.actors]       # 0.01
             self.memory = ReplayMemory(capacity)
             self.var = [1.0 for i in range(n_agents)]
         else:
@@ -61,7 +61,7 @@ class MADDPG:
         self.dim_act_sum = dim_act_sum
         self.use_cuda = th.cuda.is_available()
         self.episodes_before_train = episodes_before_train
-        self.clip = 1500.0    # 10
+        self.clip = 50.0    # 10
 
         self.GAMMA = 0.95
         self.tau = 0.01
@@ -145,7 +145,8 @@ class MADDPG:
             )
 
             # here target_Q is y_i of TD error equation
-            target_Q = (target_Q * self.GAMMA) + (reward_batch[:, agent] * self.scale_reward)
+            # target_Q = (target_Q * self.GAMMA) + (reward_batch[:, agent] * self.scale_reward)
+            target_Q = target_Q * self.GAMMA + reward_batch[:, agent]
 
             loss_Q = nn.MSELoss()(current_Q, target_Q.detach())
             loss_Q.backward()
@@ -213,7 +214,8 @@ class MADDPG:
             act += Variable(th.from_numpy(np.random.randn(self.dim_act_list[i]) * self.var[i]).type(FloatTensor))
             # print('act', act)
 
-            if self.episode_done > self.episodes_before_train and self.var[i] > 0.05:   # use more exploration??
+            # use more exploration??
+            if self.episode_done > self.episodes_before_train and self.var[i] > 0.05:
                 self.var[i] *= 0.999998
 
             act = th.clamp(act, -1.0, 1.0)

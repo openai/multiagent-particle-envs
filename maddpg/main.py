@@ -17,7 +17,7 @@ capacity = 1000000
 batch_size = 1024
 
 n_episode = 25000    # 20000
-max_steps = 250    # 1000
+max_steps = 35    # 1000
 episodes_before_train = 50     # 50 ? Not specified in paper
 episodes_to_break = 500
 
