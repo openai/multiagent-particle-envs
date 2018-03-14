@@ -1,3 +1,4 @@
+from OrnsteinUhlenbeckActionNoise import OrnsteinUhlenbeckActionNoise as ou
 from models import Critic, Actor
 import torch as th
 from copy import deepcopy
@@ -6,6 +7,7 @@ from torch.optim import Adam
 from torch.autograd import Variable
 import torch.nn as nn
 import numpy as np
+
 
 
 def soft_update(target, source, t):
@@ -27,7 +29,8 @@ class MADDPG:
                  batch_size,
                  capacity,
                  episodes_before_train,
-                 load_models=None):
+                 load_models=None,
+                 isOU=False):
         dim_obs_sum = sum(dim_obs_list)
         dim_act_sum = sum(dim_act_list)
 
@@ -36,10 +39,11 @@ class MADDPG:
             self.critics = [Critic(dim_obs_sum, dim_act_sum) for i in range(n_agents)]
             self.actors_target = deepcopy(self.actors)
             self.critics_target = deepcopy(self.critics)
-            self.critic_optimizer = [Adam(x.parameters(), lr=0.005) for x in self.critics]     # 0.01
-            self.actor_optimizer = [Adam(x.parameters(), lr=0.005) for x in self.actors]       # 0.01
+            self.critic_optimizer = [Adam(x.parameters(), lr=0.0075) for x in self.critics]     # 0.005
+            self.actor_optimizer = [Adam(x.parameters(), lr=0.0075) for x in self.actors]       # 0.005
             self.memory = ReplayMemory(capacity)
             self.var = [1.0 for i in range(n_agents)]
+            self.ou_noises = [ou(mu=np.zeros(dim_act_list[i])) for i in range(n_agents)]
         else:
             print('Start loading models!')
             states = th.load(load_models)
@@ -51,6 +55,7 @@ class MADDPG:
             self.actors_target = states['actors_target']
             self.memory = states['memory']
             self.var = states['var']
+            self.ou_noises = [ou(mu=np.zeros(dim_act_list[i]), x0=states['ou_prevs'][i]) for i in range(n_agents)]
             print('Models loaded!')
 
         self.n_agents = n_agents
@@ -62,6 +67,7 @@ class MADDPG:
         self.use_cuda = th.cuda.is_available()
         self.episodes_before_train = episodes_before_train
         self.clip = 50.0    # 10
+        self.isOU = isOU
 
         self.GAMMA = 0.95
         self.tau = 0.01
@@ -211,7 +217,10 @@ class MADDPG:
             # print(act)
 
             # ? to add exploration rate here ?
-            act += Variable(th.from_numpy(np.random.randn(self.dim_act_list[i]) * self.var[i]).type(FloatTensor))
+            if self.isOU:   # TODO
+                act += Variable(th.from_numpy(self.ou_noises[i]() * self.var[i]).type(FloatTensor))
+            else:
+                act += Variable(th.from_numpy(np.random.randn(self.dim_act_list[i]) * self.var[i]).type(FloatTensor))
             # print('act', act)
 
             # use more exploration??

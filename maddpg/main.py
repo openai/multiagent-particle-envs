@@ -4,6 +4,7 @@ from MADDPG import MADDPG
 import numpy as np
 import torch as th
 from tensorboardX import SummaryWriter
+from OrnsteinUhlenbeckActionNoise import OrnsteinUhlenbeckActionNoise as ou
 import torchvision.utils as vutils
 import time
 
@@ -14,10 +15,10 @@ dim_obs_list = [env.observation_space[i].shape[0] for i in range(n_agents)]
 dim_act_list = [env.action_space[i].n for i in range(n_agents)]
 
 capacity = 1000000
-batch_size = 1024
+batch_size = 1024   # 1024
 
 n_episode = 25000    # 20000
-max_steps = 35    # 1000
+max_steps = 30    # 35
 episodes_before_train = 50     # 50 ? Not specified in paper
 episodes_to_break = 500
 
@@ -27,7 +28,14 @@ snapshot_path = "/home/jadeng/Documents/snapshot/"
 snapshot_name = "speaker_listener_latest_episode_"
 path = snapshot_path + snapshot_name + '800'
 
-maddpg = MADDPG(n_agents, dim_obs_list, dim_act_list, batch_size, capacity, episodes_before_train, load_models=None)
+maddpg = MADDPG(n_agents,
+                dim_obs_list,
+                dim_act_list,
+                batch_size,
+                capacity,
+                episodes_before_train,
+                load_models=None,       # path
+                isOU=False)        # ou_noises
 
 FloatTensor = th.cuda.FloatTensor if maddpg.use_cuda else th.FloatTensor
 
@@ -144,7 +152,8 @@ for i_episode in range(n_episode):
                   'critics_target': maddpg.critics_target,
                   'actors_target': maddpg.actors_target,
                   'memory': maddpg.memory,
-                  'var': maddpg.var}
+                  'var': maddpg.var,
+                  'ou_prevs': [ou_noise.x_prev for ou_noise in maddpg.ou_noises]}
         th.save(states, snapshot_path + snapshot_name + str(i_episode))
 
 # print('reward_record', reward_record)
