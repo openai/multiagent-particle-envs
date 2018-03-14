@@ -17,7 +17,7 @@ dim_act_list = [env.action_space[i].n for i in range(n_agents)]
 capacity = 1000000
 batch_size = 1024   # 1024
 
-n_episode = 25000    # 20000
+n_episode = 60000    # 25000
 max_steps = 30    # 35
 episodes_before_train = 50     # 50 ? Not specified in paper
 episodes_to_break = 500

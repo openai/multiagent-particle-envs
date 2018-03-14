@@ -7,6 +7,7 @@ from torch.optim import Adam
 from torch.autograd import Variable
 import torch.nn as nn
 import numpy as np
+import pdb
 
 
 
@@ -161,7 +162,7 @@ class MADDPG:
                 nn.utils.clip_grad_norm(self.critics[agent].parameters(), self.clip)
             self.critic_optimizer[agent].step()
 
-            # actor network
+            # actor networkself.use_cuda
             self.actor_optimizer[agent].zero_grad()
             state_i = state_batch[:, index_obs:(index_obs+self.dim_obs_list[agent])]
             index_obs += self.dim_obs_list[agent]
@@ -216,18 +217,20 @@ class MADDPG:
             act = self.actors[i](sb)
             # print(act)
 
+            '''
             # ? to add exploration rate here ?
             if self.isOU:   # TODO
                 act += Variable(th.from_numpy(self.ou_noises[i]() * self.var[i]).type(FloatTensor))
             else:
                 act += Variable(th.from_numpy(np.random.randn(self.dim_act_list[i]) * self.var[i]).type(FloatTensor))
-            # print('act', act)
+                # print('act', act)
 
             # use more exploration??
             if self.episode_done > self.episodes_before_train and self.var[i] > 0.05:
                 self.var[i] *= 0.999998
 
             act = th.clamp(act, -1.0, 1.0)
+            '''
 
             actions[:, index_act:(index_act+self.dim_act_list[i])] = act
             # print('actions', actions)
