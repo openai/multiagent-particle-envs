@@ -217,12 +217,12 @@ class MADDPG:
             act = self.actors[i](sb)
             # print(act)
 
-            '''
+
             # ? to add exploration rate here ?
             if self.isOU:   # TODO
                 act += Variable(th.from_numpy(self.ou_noises[i]() * self.var[i]).type(FloatTensor))
-            else:
-                act += Variable(th.from_numpy(np.random.randn(self.dim_act_list[i]) * self.var[i]).type(FloatTensor))
+            # else:
+                # act += Variable(th.from_numpy(np.random.randn(self.dim_act_list[i]) * self.var[i]).type(FloatTensor))
                 # print('act', act)
 
             # use more exploration??
@@ -230,8 +230,6 @@ class MADDPG:
                 self.var[i] *= 0.999998
 
             act = th.clamp(act, -1.0, 1.0)
-            '''
-
             actions[:, index_act:(index_act+self.dim_act_list[i])] = act
             # print('actions', actions)
 

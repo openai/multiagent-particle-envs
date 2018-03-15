@@ -9,14 +9,19 @@ nodes = 64
 
 
 def normal_noise(dim_action):
-    n = np.random.uniform(size=dim_action)
-    n = -np.log(-np.log(n))
-    return Variable(th.from_numpy(n).type(th.cuda.FloatTensor))
-
-
-def uniform_noise(dim_action):
     n = np.random.randn(dim_action)
     return Variable(th.from_numpy(n).type(th.cuda.FloatTensor))
+
+
+def gumbel_sample(dim_action, eps=1e-20):
+    n = np.random.uniform(size=dim_action)
+    n = -np.log(-np.log(n + eps) + eps)
+    return Variable(th.from_numpy(n).type(th.cuda.FloatTensor))
+
+
+def gumbel_softmax(ret, dim_action, temp=1):
+    ret = ret + gumbel_sample(dim_action)
+    return F.softmax(ret/temp)
 
 
 class Actor(nn.Module):
@@ -31,8 +36,7 @@ class Actor(nn.Module):
         result = F.relu(self.FC1(obs))
         result = F.relu(self.FC2(result))
         result = self.FC3(result)
-        result = result + uniform_noise(self.dim_action)  # normal_noise(self.dim_action)
-        result = F.softmax(result)
+        result = gumbel_softmax(result, self.dim_action)
         return result
 
 
