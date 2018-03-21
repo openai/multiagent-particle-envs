@@ -1,35 +1,28 @@
 from torch.autograd import Variable
 from make_env import make_env
-from gym import spaces
-from MADDPG1 import MADDPG
+from MADDPG import MADDPG
 import numpy as np
 import torch as th
 from tensorboardX import SummaryWriter
+from OrnsteinUhlenbeckActionNoise import OrnsteinUhlenbeckActionNoise as ou
 import torchvision.utils as vutils
 import time
-import pdb
 
 
 env = make_env('simple_speaker_listener')
 n_agents = len(env.world.agents)
 dim_obs_list = [env.observation_space[i].shape[0] for i in range(n_agents)]
-
-dim_act_list = []
-for i in range(n_agents):
-    if isinstance(env.action_space[i], spaces.MultiDiscrete):
-        size = env.action_space[i].high - env.action_space[i].low + 1
-        dim_act_list.append(sum(size))
-    elif isinstance(env.action_space[i], spaces.Discrete):
-        dim_act_list.append(env.action_space[i].n)
-    else:
-        print(env.action_space[i])
+dim_act_list = [env.action_space[i].n for i in range(n_agents)]
 
 capacity = 1000000
-batch_size = 1024  # 1024
+batch_size = 1024   # 1024
 
-n_episode = 60000    # 20000
-max_steps = 30    # 25
+n_episode = 60000    # 25000
+max_steps = 30    # 35
 episodes_before_train = 50     # 50 ? Not specified in paper
+episodes_to_break = 500
+
+# reward_record = []
 
 snapshot_path = "/home/jadeng/Documents/snapshot/"
 # snapshot_path = "/home/jadeng/Desktop/snapshot_SL/"
@@ -50,47 +43,59 @@ FloatTensor = th.cuda.FloatTensor if maddpg.use_cuda else th.FloatTensor
 writer = SummaryWriter()
 
 for i_episode in range(n_episode):
+    obs = env.reset()
+    # obs = [obs[i] for i in range(n_agents)]
+    # import pdb
     # pdb.set_trace()
-    obs = env.reset()   # list of array
     obs = np.concatenate(obs, 0)
     if isinstance(obs, np.ndarray):
-        obs = th.FloatTensor(obs).type(FloatTensor)    # obs in Tensor
-
+        obs = th.from_numpy(obs).float()    # obs in Tensor now
     total_reward = 0.0
-
     av_critics_grad = np.zeros((n_agents, 6))
     av_actors_grad = np.zeros((n_agents, 6))
     n = 0
-    print('Simple Reference')
     print('Start of episode', i_episode)
-    print("Target landmark for agent 1: {}, Target landmark color: {}"
-          .format(env.world.agents[0].goal_b.name, env.world.agents[0].goal_b.color))
+    print('Target landmark for agent 1: ', env.world.agents[0].goal_b.name)
+    print('Target landmark color: ', env.world.agents[0].goal_b.color)
     for t in range(max_steps):
+        # print(t)
         env.render()
-        # time.sleep(0.05)
 
-        # obs Tensor turns into Variable before feed into Actor
-        obs_var = Variable(obs).type(FloatTensor)
-        action = maddpg.select_action(obs_var)      # action in Variable
-        action = action.data                        # action in Tensor
-        action_np = action.cpu().numpy()            # actions in numpy array
-        # convert action into list of numpy arrays
-        idx = 0
-        action_ls = []
-        for x in dim_act_list:
-            action_ls.append(action_np[idx:(idx+x)])
-            idx = x
-        obs_, reward, done, _ = env.step(action_ls)
+        # obs turns to Variable before feed into Actor
+        obs = Variable(obs).type(FloatTensor)
+        # print('obs', obs)
 
-        total_reward += sum(reward)
+        action = maddpg.select_action(obs).data.cpu()   # actions in Variable
+        # convert action from Variable to list
+        action = [action[0].numpy()[:dim_act_list[0]], action[0].numpy()[dim_act_list[0]:]]
+        obs_, reward, done, _ = env.step(action)
+
+        action = np.concatenate(action, 0)
+        action = th.from_numpy(action).float()
+        # print('action', action)
+
         reward = th.FloatTensor(reward).type(FloatTensor)
 
+        # obs_ = [obs_[i] for i in range(n_agents)]
         obs_ = np.concatenate(obs_, 0)
-        obs_ = th.FloatTensor(obs_).type(FloatTensor)
+        obs_ = th.from_numpy(obs_).float()  # in Tensor
+        if t != max_steps - 1:
+            next_obs = obs_
+        else:
+            next_obs = None
+        '''
+        if i_episode >= episodes_to_break and reward.sum() > 5.0:
+            break
+        '''
+        total_reward += reward.sum()
 
-        maddpg.memory.push(obs, action, obs_, reward)  # store in Tensor
+        maddpg.memory.push(obs.data, action, next_obs, reward)  # tensors
+        # print('obs', obs.data)
+        # print('action', action)
+        # print('next_obs', next_obs)
+        # print('reward', reward)
 
-        obs = obs_
+        obs = next_obs
 
         critics_grad, actors_grad = maddpg.update_policy()
 
@@ -99,13 +104,25 @@ for i_episode in range(n_episode):
             av_actors_grad += np.array(actors_grad)
             n += 1
 
+        # time.sleep(0.05)
+
     if n != 0:
         av_critics_grad = av_critics_grad / n
         av_actors_grad = av_actors_grad / n
 
     maddpg.episode_done += 1
     mean_reward = total_reward / max_steps
+    '''
+    import pdb
+    pdb.set_trace()
+    if i_episode >= episodes_to_break and n < max_steps:
+        mean_reward = total_reward / n
+    else:
+        mean_reward = total_reward / max_steps
+    '''
+
     print('End of Episode: %d, mean_reward = %f, total_reward = %f' % (i_episode, mean_reward, total_reward))
+    # reward_record.append(total_reward)
 
     # plot of reward
     writer.add_scalar('data/reward', mean_reward, i_episode)
@@ -136,8 +153,11 @@ for i_episode in range(n_episode):
                   'critics_target': maddpg.critics_target,
                   'actors_target': maddpg.actors_target,
                   'memory': maddpg.memory,
-                  'var': maddpg.var}
+                  'var': maddpg.var,
+                  'ou_prevs': [ou_noise.x_prev for ou_noise in maddpg.ou_noises]}
         th.save(states, snapshot_path + snapshot_name + str(i_episode))
+
+# print('reward_record', reward_record)
 
 writer.export_scalars_to_json("./all_scalars.json")
 writer.close()
@@ -155,6 +175,40 @@ writer.close()
 
 
 
+
+
+
+
+
+'''
+print('number of actors: ', len(maddpg.actors))
+print('number of critics: ', len(maddpg.critics))
+print('number of actors target: ', len(maddpg.actors_target))
+print('number of critics target: ', len(maddpg.critics_target))
+print('exploration rate: ', maddpg.var)
+
+for i_episode in range(n_episode):
+    obs = env.reset()
+    for t in range(max_steps):
+        env.render()
+        agent_actions = []
+        for i, agent in enumerate(env.world.agents):
+            agent_action_space = env.action_space[i]
+            action = agent_action_space.sample()
+            action_vec = np.zeros(agent_action_space.n)
+            action_vec[action] = 1
+            agent_actions.append(action_vec)
+
+        time.sleep(0.033)
+        observation, reward, done, info = env.step(agent_actions)
+
+        print(agent_actions)
+        print(observation)
+        print(reward)
+        print(done)
+        print(info)
+        print()
+'''
 
 
 

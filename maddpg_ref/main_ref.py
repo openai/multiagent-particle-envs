@@ -7,6 +7,7 @@ import torch as th
 from tensorboardX import SummaryWriter
 import torchvision.utils as vutils
 import time
+import pdb
 
 
 env = make_env('simple_reference')
@@ -24,29 +25,32 @@ for i in range(n_agents):
         print(env.action_space[i])
 
 capacity = 1000000
-batch_size = 1024
+batch_size = 2  # 1024
 
-n_episode = 25000    # 20000
-max_steps = 250    # 1000
-episodes_before_train = 50     # 50 ? Not specified in paper
-
-# reward_record = []
+n_episode = 60000    # 20000
+max_steps = 2    # 35
+episodes_before_train = 2     # 50 ? Not specified in paper
 
 snapshot_path = "/home/jadeng/Documents/snapshot/"
 snapshot_name = "reference_latest_episode_"
 path = snapshot_path + snapshot_name + '800'
 
-maddpg = MADDPG(n_agents, dim_obs_list, dim_act_list, batch_size, capacity, episodes_before_train, load_models=None)
+maddpg = MADDPG(n_agents,
+                dim_obs_list,
+                dim_act_list,
+                batch_size,
+                capacity,
+                episodes_before_train,
+                load_models=None,       # path
+                isOU=False)        # ou_noises
 
 FloatTensor = th.cuda.FloatTensor if maddpg.use_cuda else th.FloatTensor
 
-writer = SummaryWriter()
+# writer = SummaryWriter()
 
 for i_episode in range(n_episode):
+    pdb.set_trace()
     obs = env.reset()
-    # obs = [obs[i] for i in range(n_agents)]
-    # import pdb
-    # pdb.set_trace()
     obs = np.concatenate(obs, 0)
     if isinstance(obs, np.ndarray):
         obs = th.from_numpy(obs).float()    # obs in Tensor now
@@ -56,8 +60,10 @@ for i_episode in range(n_episode):
     n = 0
     print('Simple Reference')
     print('Start of episode', i_episode)
-    print('Target landmark for agent 1: ', env.world.agents[0].goal_b.name)
-    print('Target landmark color: ', env.world.agents[0].goal_b.color)
+    print("Target landmark for agent 0: {}, Target landmark color: {}"
+          .format(env.world.agents[1].goal_b.name, env.world.agents[1].goal_b.color))
+    print("Target landmark for agent 1: {}, Target landmark color: {}"
+          .format(env.world.agents[0].goal_b.name, env.world.agents[0].goal_b.color))
     for t in range(max_steps):
         # print(t)
         env.render()
@@ -80,20 +86,23 @@ for i_episode in range(n_episode):
         # obs_ = [obs_[i] for i in range(n_agents)]
         obs_ = np.concatenate(obs_, 0)
         obs_ = th.from_numpy(obs_).float()
+
+        '''
         if t != max_steps - 1:
             next_obs = obs_
         else:
             next_obs = None
+        '''
 
         total_reward += reward.sum()
 
-        maddpg.memory.push(obs.data, action, next_obs, reward)  # tensors
+        maddpg.memory.push(obs.data, action, obs_, reward)  # tensors
         # print('obs', obs.data)
         # print('action', action)
         # print('next_obs', next_obs)
         # print('reward', reward)
 
-        obs = next_obs
+        obs = obs_
 
         critics_grad, actors_grad = maddpg.update_policy()
 
@@ -113,6 +122,7 @@ for i_episode in range(n_episode):
     print('End of Episode: %d, mean_reward = %f, total_reward = %f' % (i_episode, mean_reward, total_reward))
     # reward_record.append(total_reward)
 
+    '''
     # plot of reward
     writer.add_scalar('data/reward', mean_reward, i_episode)
 
@@ -150,53 +160,19 @@ for i_episode in range(n_episode):
 writer.export_scalars_to_json("./all_scalars.json")
 writer.close()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 '''
-print('number of actors: ', len(maddpg.actors))
-print('number of critics: ', len(maddpg.critics))
-print('number of actors target: ', len(maddpg.actors_target))
-print('number of critics target: ', len(maddpg.critics_target))
-print('exploration rate: ', maddpg.var)
 
-for i_episode in range(n_episode):
-    obs = env.reset()
-    for t in range(max_steps):
-        env.render()
-        agent_actions = []
-        for i, agent in enumerate(env.world.agents):
-            agent_action_space = env.action_space[i]
-            action = agent_action_space.sample()
-            action_vec = np.zeros(agent_action_space.n)
-            action_vec[action] = 1
-            agent_actions.append(action_vec)
 
-        time.sleep(0.033)
-        observation, reward, done, info = env.step(agent_actions)
 
-        print(agent_actions)
-        print(observation)
-        print(reward)
-        print(done)
-        print(info)
-        print()
-'''
+
+
+
+
+
+
+
+
+
 
 
 

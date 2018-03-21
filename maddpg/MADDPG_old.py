@@ -145,6 +145,7 @@ class MADDPG:
                 idx += self.dim_obs_list[i]
             non_final_next_actions = th.cat((non_final_next_actions[0], non_final_next_actions[1]), 1)
 
+            # pdb.set_trace()
             target_Q = Variable(th.zeros(self.batch_size).type(FloatTensor))
             target_Q[non_final_mask] = self.critics_target[agent](
                 non_final_next_states.view(-1, self.dim_obs_sum),
@@ -239,6 +240,10 @@ class MADDPG:
         self.steps_done += 1
 
         return actions
+
+
+
+
 
 
 
