@@ -137,6 +137,7 @@ class MADDPG:
             self.critic_optimizer[agent].zero_grad()
             current_Q = self.critics[agent](whole_state, whole_action)
 
+            pdb.set_trace()
             non_final_next_actions = []
             idx = 0
             for i in range(self.n_agents):

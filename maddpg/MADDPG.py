@@ -114,6 +114,7 @@ class MADDPG:
             whole_state = state_batch.view(self.batch_size, -1)
             whole_action = action_batch.view(self.batch_size, -1)
 
+            # pdb.set_trace()
             ###### critic network #####
             self.critic_optimizer[agent].zero_grad()
             current_Q = self.critics[agent](whole_state, whole_action)
@@ -150,8 +151,8 @@ class MADDPG:
             action_i = self.actors[agent](state_i)
             ac = action_batch.clone()
             ac[:, index_act:(index_act+self.dim_act_list[agent])] = action_i
-            index_act += self.dim_act_list[agent]
             whole_action = ac.view(self.batch_size, -1)
+            index_act += self.dim_act_list[agent]
 
             actor_loss = -self.critics[agent](whole_state, whole_action)
             actor_loss = actor_loss.mean()
@@ -201,8 +202,7 @@ class MADDPG:
             if self.isOU:   # TODO
                 act += Variable(th.FloatTensor(self.ou_noises[i]() * self.var[i]).type(FloatTensor))
             # else:
-                # act += Variable(th.from_numpy(np.random.randn(self.dim_act_list[i]) * self.var[i]).type(FloatTensor))
-                # print('act', act)
+                # act += Variable(th.FloatTensor(np.random.randn(self.dim_act_list[i]) * self.var[i]).type(FloatTensor))
 
             # use more exploration??
             if self.episode_done > self.episodes_before_train and self.var[i] > 0.05:

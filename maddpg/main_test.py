@@ -1,5 +1,5 @@
 from torch.autograd import Variable
-from make_env import make_env
+from make_env import make_env_test
 from gym import spaces
 from MADDPG import MADDPG
 import numpy as np
@@ -11,7 +11,7 @@ import pdb
 
 
 # pdb.set_trace()
-env = make_env('simple_speaker_listener')
+env = make_env_test('simple_speaker_listener')
 n_agents = len(env.world.agents)
 dim_obs_list = [env.observation_space[i].shape[0] for i in range(n_agents)]
 
@@ -32,9 +32,9 @@ n_episode = 60000    # 20000
 max_steps = 30    # 25
 episodes_before_train = 50     # 50 ? Not specified in paper
 
-snapshot_path = "/home/jadeng/Documents/snapshot/"
-# snapshot_path = "/home/jadeng/Desktop/snapshot_SL/"
-snapshot_name = "speaker_listener_latest_episode_"
+# snapshot_path = "/home/jadeng/Documents/snapshot/"
+snapshot_path = "/home/jadeng/Desktop/snapshot_SL_test/"
+snapshot_name = "SLtest_latest_episode_"
 path = snapshot_path + snapshot_name + '800'
 
 maddpg = MADDPG(n_agents,
@@ -62,7 +62,7 @@ for i_episode in range(n_episode):
     av_critics_grad = np.zeros((n_agents, 6))
     av_actors_grad = np.zeros((n_agents, 6))
     n = 0
-    print('Simple Speaker Listener')
+    print('Simple Speaker Listener Test')
     print('Start of episode', i_episode)
     print("Target landmark for agent 1: {}, Target landmark color: {}"
           .format(env.world.agents[0].goal_b.name, env.world.agents[0].goal_b.color))

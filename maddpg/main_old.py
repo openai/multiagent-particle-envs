@@ -1,12 +1,13 @@
 from torch.autograd import Variable
 from make_env import make_env
-from MADDPG import MADDPG
+from MADDPG_old import MADDPG
 import numpy as np
 import torch as th
 from tensorboardX import SummaryWriter
 from OrnsteinUhlenbeckActionNoise import OrnsteinUhlenbeckActionNoise as ou
 import torchvision.utils as vutils
 import time
+import pdb
 
 
 env = make_env('simple_speaker_listener')
@@ -15,11 +16,11 @@ dim_obs_list = [env.observation_space[i].shape[0] for i in range(n_agents)]
 dim_act_list = [env.action_space[i].n for i in range(n_agents)]
 
 capacity = 1000000
-batch_size = 1024   # 1024
+batch_size = 2   # 1024
 
 n_episode = 60000    # 25000
-max_steps = 30    # 35
-episodes_before_train = 50     # 50 ? Not specified in paper
+max_steps = 2    # 35
+episodes_before_train = 1     # 50 ? Not specified in paper
 episodes_to_break = 500
 
 # reward_record = []
@@ -67,6 +68,7 @@ for i_episode in range(n_episode):
 
         action = maddpg.select_action(obs).data.cpu()   # actions in Variable
         # convert action from Variable to list
+        pdb.set_trace()
         action = [action[0].numpy()[:dim_act_list[0]], action[0].numpy()[dim_act_list[0]:]]
         obs_, reward, done, _ = env.step(action)
 

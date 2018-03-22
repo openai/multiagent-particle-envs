@@ -154,6 +154,8 @@ class MultiAgentEnv(gym.Env):
         else:
             action = [action]
 
+        import pdb
+        # pdb.set_trace()
         if agent.movable:
             # physical action
             if self.discrete_action_input:
