@@ -30,8 +30,8 @@ class MADDPG:
                  batch_size,
                  capacity,
                  episodes_before_train,
-                 load_models=None,
-                 isOU=False):
+                 action_noise=None,
+                 load_models=None):
         dim_obs_sum = sum(dim_obs_list)
         dim_act_sum = sum(dim_act_list)
 
@@ -44,7 +44,8 @@ class MADDPG:
             self.actor_optimizer = [Adam(x.parameters(), lr=0.0075) for x in self.actors]       # 0.01, 0.005
             self.memory = ReplayMemory(capacity)
             self.var = [1.0 for i in range(n_agents)]
-            self.ou_noises = [ou(mu=np.zeros(dim_act_list[i])) for i in range(n_agents)]
+            if action_noise == "OU_noise":
+                self.ou_noises = [ou(mu=np.zeros(dim_act_list[i])) for i in range(n_agents)]
         else:
             print('Start loading models!')
             states = th.load(load_models)
@@ -56,7 +57,8 @@ class MADDPG:
             self.actors_target = states['actors_target']
             self.memory = states['memory']
             self.var = states['var']
-            self.ou_noises = [ou(mu=np.zeros(dim_act_list[i]), x0=states['ou_prevs'][i]) for i in range(n_agents)]
+            if action_noise == "OU_noise":
+                self.ou_noises = [ou(mu=np.zeros(dim_act_list[i]), x0=states['ou_prevs'][i]) for i in range(n_agents)]
             print('Models loaded!')
 
         self.n_agents = n_agents
@@ -68,7 +70,7 @@ class MADDPG:
         self.use_cuda = th.cuda.is_available()
         self.episodes_before_train = episodes_before_train
         self.clip = 50.0    # 10
-        self.isOU = isOU
+        self.action_noise = action_noise
 
         self.GAMMA = 0.95
         self.tau = 0.01
@@ -91,7 +93,6 @@ class MADDPG:
         if self.episode_done <= self.episodes_before_train:
             return None, None
 
-        # ByteTensor = th.cuda.ByteTensor if self.use_cuda else th.ByteTensor
         FloatTensor = th.cuda.FloatTensor if self.use_cuda else th.FloatTensor
 
         c_loss = []
@@ -198,16 +199,17 @@ class MADDPG:
             sb = obs[index_obs:(index_obs+self.dim_obs_list[i])]
             act = self.actors[i](sb)
 
-            # ? to add exploration rate here ?
-            if self.isOU:   # TODO
+            # add exploration noise of OU process or Gaussian
+            if self.dim_act_list[i] == 5 and self.action_noise == "OU_noise":
                 act += Variable(th.FloatTensor(self.ou_noises[i]() * self.var[i]).type(FloatTensor))
-            # else:
-                # act += Variable(th.FloatTensor(np.random.randn(self.dim_act_list[i]) * self.var[i]).type(FloatTensor))
+            elif self.dim_act_list[i] == 5 and self.action_noise == "Gaussian_noise":
+                act += Variable(th.FloatTensor(np.random.randn(self.dim_act_list[i]) * self.var[i]).type(FloatTensor))
 
-            # use more exploration??
+            # decay of action exploration
             if self.episode_done > self.episodes_before_train and self.var[i] > 0.05:
                 self.var[i] *= 0.999998
 
+            # ? remove ?
             act = th.clamp(act, -1.0, 1.0)
             actions[index_act:(index_act+self.dim_act_list[i])] = act
 

@@ -43,8 +43,8 @@ maddpg = MADDPG(n_agents,
                 batch_size,
                 capacity,
                 episodes_before_train,
-                load_models=None,       # path
-                isOU=False)        # ou_noises
+                action_noise="Gaussian_noise",  # ou_noises
+                load_models=None)               # path
 
 FloatTensor = th.cuda.FloatTensor if maddpg.use_cuda else th.FloatTensor
 
@@ -130,14 +130,25 @@ for i_episode in range(n_episode):
     # to save models every 200 episodes
     if i_episode != 0 and i_episode % 200 == 0:
         print('Save models!')
-        states = {'critics': maddpg.critics,
-                  'actors': maddpg.actors,
-                  'critic_optimizer': maddpg.critic_optimizer,
-                  'actor_optimizer': maddpg.actor_optimizer,
-                  'critics_target': maddpg.critics_target,
-                  'actors_target': maddpg.actors_target,
-                  'memory': maddpg.memory,
-                  'var': maddpg.var}
+        if maddpg.action_noise == "OU_noise":
+            states = {'critics': maddpg.critics,
+                      'actors': maddpg.actors,
+                      'critic_optimizer': maddpg.critic_optimizer,
+                      'actor_optimizer': maddpg.actor_optimizer,
+                      'critics_target': maddpg.critics_target,
+                      'actors_target': maddpg.actors_target,
+                      'memory': maddpg.memory,
+                      'var': maddpg.var,
+                      'ou_prevs': [ou_noise.x_prev for ou_noise in maddpg.ou_noises]}
+        else:
+            states = {'critics': maddpg.critics,
+                      'actors': maddpg.actors,
+                      'critic_optimizer': maddpg.critic_optimizer,
+                      'actor_optimizer': maddpg.actor_optimizer,
+                      'critics_target': maddpg.critics_target,
+                      'actors_target': maddpg.actors_target,
+                      'memory': maddpg.memory,
+                      'var': maddpg.var}
         th.save(states, snapshot_path + snapshot_name + str(i_episode))
 
 writer.export_scalars_to_json("./all_scalars.json")
