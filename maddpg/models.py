@@ -36,7 +36,14 @@ class Actor(nn.Module):
         result = F.relu(self.FC1(obs))
         result = F.relu(self.FC2(result))
         result = self.FC3(result)
-        result = gumbel_softmax(result, self.dim_action)
+        if self.dim_action == 3:
+            result = gumbel_softmax(result, self.dim_action)
+        elif self.dim_action == 5:
+            result = F.tanh(result, self.dim_action)
+        else:   # action space with comm & physical action
+            result_c = gumbel_softmax(result, 3)
+            result_u = F.tanh(result, 5)
+            result = th.cat((result_c, result_u), 1)
         return result
 
 
@@ -66,13 +73,7 @@ class Critic(nn.Module):
 
 
 
-'''
-n = np.random.uniform(size=self.dim_act_list[i])
-act += Variable(th.from_numpy(np.random.uniform(size=self.dim_act_list[i]) * self.var[i]).type(FloatTensor))
 
-u = tf.random_uniform(tf.shape(self.logits))
-return U.softmax(self.logits - tf.log(-tf.log(u)), axis=-1)
-'''
 
 
 
