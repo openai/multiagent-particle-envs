@@ -123,7 +123,7 @@ for i_episode in range(n_episode):
     for i in range(6):
         writer.add_scalar('data/listener_critic_gradient', av_critics_grad[1][i], i_episode)
 
-    # plot of agent0 - speaker gradient of critics net
+    # plot of agent1 - speaker gradient of critics net
     for i in range(6):
         writer.add_scalar('data/listener_actor_gradient', av_actors_grad[1][i], i_episode)
 

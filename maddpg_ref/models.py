@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 import numpy as np
+import pdb
 
 
 nodes = 64
@@ -20,6 +21,7 @@ def gumbel_sample(dim_action, eps=1e-20):
 
 
 def gumbel_softmax(ret, dim_action, temp=1):
+    # pdb.set_trace()
     ret = ret + gumbel_sample(dim_action)
     return F.softmax(ret/temp)
 
@@ -36,7 +38,16 @@ class Actor(nn.Module):
         result = F.relu(self.FC1(obs))
         result = F.relu(self.FC2(result))
         result = self.FC3(result)
-        result = gumbel_softmax(result, self.dim_action)
+        # gumbel_softmax for comm action and tanh for physical action
+        if self.dim_action == 3:
+            result = gumbel_softmax(result, self.dim_action)
+        elif self.dim_action == 5:
+            result = F.tanh(result)
+        elif self.dim_action == 8:   # action space with comm & physical action
+            result_c = gumbel_softmax(result[:, :3], 3)
+            result_u = F.tanh(result[:, 3:])
+            result = th.cat((result_c, result_u), 1)
+        # result = gumbel_softmax(result, self.dim_action)
         return result
 
 
@@ -58,3 +69,17 @@ class Critic(nn.Module):
         result = F.relu(self.FC2(result))
         result = self.FC3(result)
         return result
+
+
+
+
+
+
+
+
+
+
+
+
+
+

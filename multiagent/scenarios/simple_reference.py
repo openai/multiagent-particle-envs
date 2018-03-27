@@ -60,7 +60,10 @@ class Scenario(BaseScenario):
         if agent.goal_a is None or agent.goal_b is None:
             return 0.0
         dist2 = np.sum(np.square(agent.goal_a.state.p_pos - agent.goal_b.state.p_pos))
-        return -dist2  # np.exp(-dist2)
+        dist = np.sqrt(np.sum(np.square(agent.goal_a.state.p_pos - agent.goal_b.state.p_pos)))
+        # decide reward here
+        r = -dist2-dist
+        return r    # -dist2  # np.exp(-dist2)
 
     def observation(self, agent, world):
         # goal positions

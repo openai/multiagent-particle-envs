@@ -62,6 +62,7 @@ for i_episode in range(n_episode):
         # print(t)
         env.render()
 
+        pdb.set_trace()
         # obs turns to Variable before feed into Actor
         obs = Variable(obs).type(FloatTensor)
         # print('obs', obs)
