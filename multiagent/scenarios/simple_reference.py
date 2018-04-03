@@ -13,7 +13,10 @@ class Scenario(BaseScenario):
         for i, agent in enumerate(world.agents):
             agent.name = 'agent %d' % i
             agent.collide = False
-            agent.size = 0.07
+            if i == 0:
+                agent.size = 0.045
+            elif i == 2:
+                agent.size = 0.075
             # agent.u_noise = 1e-1
             # agent.c_noise = 1e-1
         # add landmarks
@@ -22,7 +25,7 @@ class Scenario(BaseScenario):
             landmark.name = 'landmark %d' % i
             landmark.collide = False
             landmark.movable = False
-            landmark.size = 0.045
+            landmark.size = 0.04
         # make initial conditions
         self.reset_world(world)
         return world
@@ -34,8 +37,10 @@ class Scenario(BaseScenario):
             agent.goal_b = None
         # want other agent to go to the goal landmark
         world.agents[0].goal_a = world.agents[1]
-        world.agents[0].goal_b = np.random.choice(world.landmarks)
         world.agents[1].goal_a = world.agents[0]
+        world.agents[0].goal_b = world.landmarks[0]
+        world.agents[1].goal_b = world.landmarks[0]
+        world.agents[0].goal_b = np.random.choice(world.landmarks)
         world.agents[1].goal_b = np.random.choice(world.landmarks)
         # random properties for agents
         for i, agent in enumerate(world.agents):
@@ -57,12 +62,21 @@ class Scenario(BaseScenario):
             landmark.state.p_vel = np.zeros(world.dim_p)
 
     def reward(self, agent, world):
-        if agent.goal_a is None or agent.goal_b is None:
+        # if agent.goal_a is None or agent.goal_b is None:
+        a0 = world.agents[0]
+        a1 = world.agents[1]
+        if a0.goal_a is None or a0.goal_b is None or a1.goal_a is None or a1.goal_b is None:
             return 0.0
-        dist2 = np.sum(np.square(agent.goal_a.state.p_pos - agent.goal_b.state.p_pos))
-        dist = np.sqrt(np.sum(np.square(agent.goal_a.state.p_pos - agent.goal_b.state.p_pos)))
+        # squared distance & distance between a1 and its target
+        dist2_0 = np.sum(np.square(a0.goal_a.state.p_pos - a0.goal_b.state.p_pos))
+        dist_0 = np.sqrt(np.sum(np.square(a0.goal_a.state.p_pos - a0.goal_b.state.p_pos)))
+        r0 = -dist2_0 - dist_0
+        # squared distance & distance between a0 and its target
+        dist2_1 = np.sum(np.square(a1.goal_a.state.p_pos - a1.goal_b.state.p_pos))
+        dist_1 = np.sqrt(np.sum(np.square(a1.goal_a.state.p_pos - a1.goal_b.state.p_pos)))
+        r1 = -dist2_1 - dist_1
         # decide reward here
-        r = -dist2-dist
+        r = (r0 + r1) / 2
         return r    # -dist2  # np.exp(-dist2)
 
     def observation(self, agent, world):
