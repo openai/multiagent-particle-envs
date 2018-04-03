@@ -31,7 +31,7 @@ n_episode = 60000    # 20000
 max_steps = 30    # 35
 episodes_before_train = 50     # 50 ? Not specified in paper
 
-snapshot_path = "/home/jadeng/Documents/snapshot/ref/"
+snapshot_path = "/home/jadeng/Documents/snapshot/"
 snapshot_name = "reference_latest_episode_"
 path = snapshot_path + snapshot_name + '800'
 
@@ -62,8 +62,8 @@ for i_episode in range(n_episode):
     n = 0
     print('Simple Reference')
     print('Start of episode', i_episode)
-    print("Target landmark for agent 0: {}, Target landmark color: {}"
-          .format(env.world.agents[1].goal_b.name, env.world.agents[1].goal_b.color))
+    #print("Target landmark for agent 0: {}, Target landmark color: {}"
+     #     .format(env.world.agents[1].goal_b.name, env.world.agents[1].goal_b.color))
     print("Target landmark for agent 1: {}, Target landmark color: {}"
           .format(env.world.agents[0].goal_b.name, env.world.agents[0].goal_b.color))
     for t in range(max_steps):

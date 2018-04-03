@@ -32,7 +32,7 @@ n_episode = 60000    # 20000
 max_steps = 30    # 25
 episodes_before_train = 50     # 50 ? Not specified in paper
 
-snapshot_path = "/home/jadeng/Documents/snapshot/SL/"
+snapshot_path = "/home/jadeng/Documents/snapshot/"
 # snapshot_path = "/home/jadeng/Desktop/snapshot_SL/"
 snapshot_name = "speaker_listener_latest_episode_"
 path = snapshot_path + snapshot_name + '800'

@@ -57,22 +57,12 @@ class Scenario(BaseScenario):
             landmark.state.p_vel = np.zeros(world.dim_p)
 
     def reward(self, agent, world):
-        # if agent.goal_a is None or agent.goal_b is None:
-        #     return 0.0
-        a0 = world.agents[0]
-        a1 = world.agents[1]
-        if a0.goal_a is None or a0.goal_b is None or a1.goal_a is None or a1.goal_b is None:
+        if agent.goal_a is None or agent.goal_b is None:
             return 0.0
-        # squared distance & distance between a1 and its target
-        dist2_0 = np.sum(np.square(a0.goal_a.state.p_pos - a0.goal_b.state.p_pos))
-        dist_0 = np.sqrt(np.sum(np.square(a0.goal_a.state.p_pos - a0.goal_b.state.p_pos)))
-        r0 = -dist2_0 - dist_0
-        # squared distance & distance between a0 and its target
-        dist2_1 = np.sum(np.square(a1.goal_a.state.p_pos - a1.goal_b.state.p_pos))
-        dist_1 = np.sqrt(np.sum(np.square(a1.goal_a.state.p_pos - a1.goal_b.state.p_pos)))
-        r1 = -dist2_1 - dist_1
+        dist2 = np.sum(np.square(agent.goal_a.state.p_pos - agent.goal_b.state.p_pos))
+        dist = np.sqrt(np.sum(np.square(agent.goal_a.state.p_pos - agent.goal_b.state.p_pos)))
         # decide reward here
-        r = r0 + r1
+        r = -dist2-dist
         return r    # -dist2  # np.exp(-dist2)
 
     def observation(self, agent, world):
