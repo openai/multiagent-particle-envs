@@ -25,13 +25,13 @@ for i in range(n_agents):
         print(env.action_space[i])
 
 capacity = 1000000
-batch_size = 2  # 1024
+batch_size = 1024  # 1024
 
 n_episode = 60000    # 20000
-max_steps = 2    # 35
-episodes_before_train = 2     # 50 ? Not specified in paper
+max_steps = 35    # 35
+episodes_before_train = 50     # 50 ? Not specified in paper
 
-snapshot_path = "/home/jadeng/Documents/snapshot/ref_hra"
+snapshot_path = "/home/jadeng/Documents/snapshot/ref_hra/"
 snapshot_name = "reference_latest_episode_"
 path = snapshot_path + snapshot_name + '800'
 

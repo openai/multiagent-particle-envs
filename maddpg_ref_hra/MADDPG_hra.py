@@ -115,7 +115,7 @@ class MADDPG:
             whole_state = state_batch.view(self.batch_size, -1)
             whole_action = action_batch.view(self.batch_size, -1)
 
-            pdb.set_trace()
+            # pdb.set_trace()
             ###### critic network #####
             self.critic_optimizer[agent].zero_grad()
             current_Q = self.critics[agent](whole_state, whole_action)
