@@ -15,7 +15,7 @@ class Scenario(BaseScenario):
             agent.collide = False
             if i == 0:
                 agent.size = 0.045
-            elif i == 1:
+            elif i == 2:
                 agent.size = 0.075
             # agent.u_noise = 1e-1
             # agent.c_noise = 1e-1
@@ -38,8 +38,8 @@ class Scenario(BaseScenario):
         # want other agent to go to the goal landmark
         world.agents[0].goal_a = world.agents[1]
         world.agents[1].goal_a = world.agents[0]
-        # world.agents[0].goal_b = world.landmarks[0]
-        # world.agents[1].goal_b = world.landmarks[0]
+        world.agents[0].goal_b = world.landmarks[0]
+        world.agents[1].goal_b = world.landmarks[0]
         world.agents[0].goal_b = np.random.choice(world.landmarks)
         world.agents[1].goal_b = np.random.choice(world.landmarks)
         # random properties for agents
@@ -62,31 +62,6 @@ class Scenario(BaseScenario):
             landmark.state.p_vel = np.zeros(world.dim_p)
 
     def reward(self, agent, world):
-        a0 = world.agents[0]
-        a1 = world.agents[1]
-
-        if a0.goal_a is None or a0.goal_b is None or a1.goal_a is None or a1.goal_b is None:
-            return 0.0
-
-        # reward for physical action
-        dist2_u = np.sum(np.square(agent.state.p_pos - agent.goal_b.state.p_pos))
-        dist_u = np.sqrt(np.sum(np.square(agent.state.p_pos - agent.goal_b.state.p_pos)))
-        r_u = -dist2_u - dist_u
-
-        # reward for communication action
-        if agent is a0:
-            dist2_c = np.sum(np.square(a1.state.p_pos - a1.goal_b.state.p_pos))
-            dist_c = np.sqrt(np.sum(np.square(a1.state.p_pos - a1.goal_b.state.p_pos)))
-            r_c = -dist2_c - dist_c
-        else:
-            dist2_c = np.sum(np.square(a0.state.p_pos - a0.goal_b.state.p_pos))
-            dist_c = np.sqrt(np.sum(np.square(a0.state.p_pos - a0.goal_b.state.p_pos)))
-            r_c = -dist2_c - dist_c
-
-        return [r_u, r_c]     # np.exp(-dist2)
-
-    '''
-    def reward(self, agent, world):
         # if agent.goal_a is None or agent.goal_b is None:
         a0 = world.agents[0]
         a1 = world.agents[1]
@@ -103,7 +78,6 @@ class Scenario(BaseScenario):
         # decide reward here
         r = (r0 + r1) / 2
         return r    # -dist2  # np.exp(-dist2)
-        '''
 
     def observation(self, agent, world):
         # goal positions
