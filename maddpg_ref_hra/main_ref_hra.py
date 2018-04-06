@@ -112,7 +112,7 @@ for i_episode in range(n_episode):
     print('End of Episode: %d, mean_reward = %f, total_reward = %f' % (i_episode, mean_reward, total_reward))
 
     # plot of reward
-    writer.add_scalar('data/reward_ref_hra', mean_reward, i_episode)
+    writer.add_scalar('data/reward_refHRA', mean_reward, i_episode)
 
     # plot of agent0 - speaker gradient of critic net
     for i in range(6):
