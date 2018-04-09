@@ -77,7 +77,7 @@ class Scenario(BaseScenario):
         r1 = -dist2_1 - dist_1
         # decide reward here
         r = (r0 + r1) / 2
-        return r    # -dist2  # np.exp(-dist2)
+        return r  # -dist2  # np.exp(-dist2)
 
     def observation(self, agent, world):
         # goal positions

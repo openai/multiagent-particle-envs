@@ -70,44 +70,51 @@ class Scenario(BaseScenario):
 
         if agent is a0:
             # reward for physical action
-            dist2_u = np.sum(np.square(a0.state.p_pos - a1.goal_b.state.p_pos))
-            dist_u = np.sqrt(np.sum(np.square(a0.state.p_pos - a1.goal_b.state.p_pos)))
+            dist2_u = np.sum(np.square(a1.goal_a.state.p_pos - a1.goal_b.state.p_pos))
+            dist_u = np.sqrt(dist2_u)
             r_u = -dist2_u - dist_u
             # reward for communication action
-            dist2_c = np.sum(np.square(a1.state.p_pos - a0.goal_b.state.p_pos))
-            dist_c = np.sqrt(np.sum(np.square(a1.state.p_pos - a0.goal_b.state.p_pos)))
+            dist2_c = np.sum(np.square(a0.goal_a.state.p_pos - a0.goal_b.state.p_pos))
+            dist_c = np.sqrt(dist2_c)
             r_c = -dist2_c - dist_c
         else:   # agent is a1
             # reward for physical action
-            dist2_u = np.sum(np.square(a1.state.p_pos - a0.goal_b.state.p_pos))
-            dist_u = np.sqrt(np.sum(np.square(a1.state.p_pos - a0.goal_b.state.p_pos)))
+            dist2_u = np.sum(np.square(a0.goal_a.state.p_pos - a0.goal_b.state.p_pos))
+            dist_u = np.sqrt(dist2_u)
             r_u = -dist2_u - dist_u
             # reward for communication action
-            dist2_c = np.sum(np.square(a0.state.p_pos - a1.goal_b.state.p_pos))
-            dist_c = np.sqrt(np.sum(np.square(a0.state.p_pos - a1.goal_b.state.p_pos)))
+            dist2_c = np.sum(np.square(a1.goal_a.state.p_pos - a1.goal_b.state.p_pos))
+            dist_c = np.sqrt(dist2_c)
             r_c = -dist2_c - dist_c
 
         return [r_u, r_c]     # np.exp(-dist2)
 
     '''
+    # incorrect reward assignment
     def reward(self, agent, world):
         # if agent.goal_a is None or agent.goal_b is None:
         a0 = world.agents[0]
         a1 = world.agents[1]
         if a0.goal_a is None or a0.goal_b is None or a1.goal_a is None or a1.goal_b is None:
             return 0.0
-        # squared distance & distance between a1 and its target
-        dist2_0 = np.sum(np.square(a0.goal_a.state.p_pos - a0.goal_b.state.p_pos))
-        dist_0 = np.sqrt(np.sum(np.square(a0.goal_a.state.p_pos - a0.goal_b.state.p_pos)))
-        r0 = -dist2_0 - dist_0
-        # squared distance & distance between a0 and its target
-        dist2_1 = np.sum(np.square(a1.goal_a.state.p_pos - a1.goal_b.state.p_pos))
-        dist_1 = np.sqrt(np.sum(np.square(a1.goal_a.state.p_pos - a1.goal_b.state.p_pos)))
-        r1 = -dist2_1 - dist_1
-        # decide reward here
-        r = (r0 + r1) / 2
-        return r    # -dist2  # np.exp(-dist2)
-        '''
+
+        # reward for physical action
+        dist2_u = np.sum(np.square(agent.state.p_pos - agent.goal_b.state.p_pos))
+        dist_u = np.sqrt(np.sum(np.square(agent.state.p_pos - agent.goal_b.state.p_pos)))
+        r_u = -dist2_u - dist_u
+
+        # reward for communication action
+        if agent is a0:
+            dist2_c = np.sum(np.square(a1.state.p_pos - a1.goal_b.state.p_pos))
+            dist_c = np.sqrt(np.sum(np.square(a1.state.p_pos - a1.goal_b.state.p_pos)))
+            r_c = -dist2_c - dist_c
+        else:   # agent is a1
+            dist2_c = np.sum(np.square(a0.state.p_pos - a0.goal_b.state.p_pos))
+            dist_c = np.sqrt(np.sum(np.square(a0.state.p_pos - a0.goal_b.state.p_pos)))
+            r_c = -dist2_c - dist_c
+
+        return [r_u, r_c]     # np.exp(-dist2)
+    '''
 
     def observation(self, agent, world):
         # goal positions
