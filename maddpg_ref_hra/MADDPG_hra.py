@@ -155,6 +155,7 @@ class MADDPG:
             whole_action = ac.view(self.batch_size, -1)
             index_act += self.dim_act_list[agent]
 
+            # pdb.set_trace()
             actor_loss = -self.critics[agent](whole_state, whole_action)
             actor_loss = actor_loss.mean()
             actor_loss.backward()

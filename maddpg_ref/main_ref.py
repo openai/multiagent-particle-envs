@@ -50,9 +50,9 @@ writer = SummaryWriter()
 
 for i_episode in range(n_episode):
     # pdb.set_trace()
-    if i_episode < 2000:
+    if i_episode < 1000:
         obs = env.reset(0)
-    elif i_episode >= 2000 and i_episode < 5000:
+    elif 1000 <= i_episode < 3000:
         obs = env.reset(1)
     else:
         obs = env.reset(2)
