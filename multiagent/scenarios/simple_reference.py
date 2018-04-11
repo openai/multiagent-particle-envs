@@ -131,33 +131,6 @@ class Scenario(BaseScenario):
 
         return [r_u, r_c]     # np.exp(-dist2)
 
-    '''
-    # incorrect reward assignment
-    def reward(self, agent, world):
-        # if agent.goal_a is None or agent.goal_b is None:
-        a0 = world.agents[0]
-        a1 = world.agents[1]
-        if a0.goal_a is None or a0.goal_b is None or a1.goal_a is None or a1.goal_b is None:
-            return 0.0
-
-        # reward for physical action
-        dist2_u = np.sum(np.square(agent.state.p_pos - agent.goal_b.state.p_pos))
-        dist_u = np.sqrt(np.sum(np.square(agent.state.p_pos - agent.goal_b.state.p_pos)))
-        r_u = -dist2_u - dist_u
-
-        # reward for communication action
-        if agent is a0:
-            dist2_c = np.sum(np.square(a1.state.p_pos - a1.goal_b.state.p_pos))
-            dist_c = np.sqrt(np.sum(np.square(a1.state.p_pos - a1.goal_b.state.p_pos)))
-            r_c = -dist2_c - dist_c
-        else:   # agent is a1
-            dist2_c = np.sum(np.square(a0.state.p_pos - a0.goal_b.state.p_pos))
-            dist_c = np.sqrt(np.sum(np.square(a0.state.p_pos - a0.goal_b.state.p_pos)))
-            r_c = -dist2_c - dist_c
-
-        return [r_u, r_c]     # np.exp(-dist2)
-    '''
-
     def observation(self, agent, world):
         # goal positions
         # goal_pos = [np.zeros(world.dim_p), np.zeros(world.dim_p)]
