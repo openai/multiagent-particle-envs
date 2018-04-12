@@ -168,6 +168,18 @@ class MADDPG:
                 self.actor_optimizer[agent].step()
 
             '''
+            # update actor network from gradients of physical and comm loss
+            loss = []
+            for i in range(len(actor_loss[0])):
+                loss.append(actor_loss[:, i].mean())
+            loss.backward(loss)
+
+            if self.clip is not None:
+                nn.utils.clip_grad_norm(self.actors[agent].parameters(), self.clip)
+            self.actor_optimizer[agent].step()
+            '''
+
+            '''
             actor_loss = actor_loss.mean()
             actor_loss.backward()
 

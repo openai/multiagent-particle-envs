@@ -70,66 +70,23 @@ class Scenario(BaseScenario):
             landmark.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
             landmark.state.p_vel = np.zeros(world.dim_p)
 
-    '''
-    def reset_world(self, world):
-        # assign goals to agents
-        for agent in world.agents:
-            agent.goal_a = None
-            agent.goal_b = None
-        # want other agent to go to the goal landmark
-        world.agents[0].goal_a = world.agents[1]    # communicate to the other agent
-        world.agents[1].goal_a = world.agents[0]
-        # world.agents[0].goal_b = world.landmarks[0]
-        # world.agents[1].goal_b = world.landmarks[0]
-        world.agents[0].goal_b = np.random.choice(world.landmarks)  # target for the other agent
-        world.agents[1].goal_b = np.random.choice(world.landmarks)
-        # random properties for agents
-        for i, agent in enumerate(world.agents):
-            agent.color = np.array([0.25, 0.25, 0.25])
-            # random properties for landmarks
-        world.landmarks[0].color = np.array([0.75, 0.25, 0.25])
-        world.landmarks[1].color = np.array([0.25, 0.75, 0.25])
-        world.landmarks[2].color = np.array([0.25, 0.25, 0.75])
-        # special colors for goals
-        world.agents[0].goal_a.color = world.agents[0].goal_b.color + np.array([0.5, 0.5, 0.5])
-        world.agents[1].goal_a.color = world.agents[1].goal_b.color + np.array([0.5, 0.5, 0.5])
-        # set random initial states
-        for agent in world.agents:
-            agent.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
-            agent.state.p_vel = np.zeros(world.dim_p)
-            agent.state.c = np.zeros(world.dim_c)
-        for i, landmark in enumerate(world.landmarks):
-            landmark.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
-            landmark.state.p_vel = np.zeros(world.dim_p)
-    '''
-
     def reward(self, agent, world):
+        # if agent.goal_a is None or agent.goal_b is None:
         a0 = world.agents[0]
         a1 = world.agents[1]
-
         if a0.goal_a is None or a0.goal_b is None or a1.goal_a is None or a1.goal_b is None:
             return 0.0
-
-        if agent is a0:
-            # reward for physical action
-            dist2_u = np.sum(np.square(a1.goal_a.state.p_pos - a1.goal_b.state.p_pos))
-            dist_u = np.sqrt(dist2_u)
-            r_u = -dist2_u - dist_u
-            # reward for communication action
-            dist2_c = np.sum(np.square(a0.goal_a.state.p_pos - a0.goal_b.state.p_pos))
-            dist_c = np.sqrt(dist2_c)
-            r_c = -dist2_c - dist_c
-        else:   # agent is a1
-            # reward for physical action
-            dist2_u = np.sum(np.square(a0.goal_a.state.p_pos - a0.goal_b.state.p_pos))
-            dist_u = np.sqrt(dist2_u)
-            r_u = -dist2_u - dist_u
-            # reward for communication action
-            dist2_c = np.sum(np.square(a1.goal_a.state.p_pos - a1.goal_b.state.p_pos))
-            dist_c = np.sqrt(dist2_c)
-            r_c = -dist2_c - dist_c
-
-        return [r_u, r_c]     # np.exp(-dist2)
+        # squared distance & distance between a1 and its target
+        dist2_0 = np.sum(np.square(a0.goal_a.state.p_pos - a0.goal_b.state.p_pos))
+        dist_0 = np.sqrt(np.sum(np.square(a0.goal_a.state.p_pos - a0.goal_b.state.p_pos)))
+        r0 = -dist2_0 - dist_0
+        # squared distance & distance between a0 and its target
+        dist2_1 = np.sum(np.square(a1.goal_a.state.p_pos - a1.goal_b.state.p_pos))
+        dist_1 = np.sqrt(np.sum(np.square(a1.goal_a.state.p_pos - a1.goal_b.state.p_pos)))
+        r1 = -dist2_1 - dist_1
+        # decide reward here
+        r = (r0 + r1) / 2
+        return r  # -dist2  # np.exp(-dist2)
 
     def observation(self, agent, world):
         # goal positions
