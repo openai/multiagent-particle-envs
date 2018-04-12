@@ -78,11 +78,11 @@ class Scenario(BaseScenario):
             return 0.0
         # squared distance & distance between a1 and its target
         dist2_0 = np.sum(np.square(a0.goal_a.state.p_pos - a0.goal_b.state.p_pos))
-        dist_0 = np.sqrt(np.sum(np.square(a0.goal_a.state.p_pos - a0.goal_b.state.p_pos)))
+        dist_0 = np.sqrt(dist2_0)
         r0 = -dist2_0 - dist_0
         # squared distance & distance between a0 and its target
         dist2_1 = np.sum(np.square(a1.goal_a.state.p_pos - a1.goal_b.state.p_pos))
-        dist_1 = np.sqrt(np.sum(np.square(a1.goal_a.state.p_pos - a1.goal_b.state.p_pos)))
+        dist_1 = np.sqrt(dist2_1)
         r1 = -dist2_1 - dist_1
         # decide reward here
         r = (r0 + r1) / 2

@@ -47,7 +47,6 @@ class Actor(nn.Module):
             result_u = F.tanh(result[:, :5])
             result_c = gumbel_softmax(result[:, 5:], 3)
             result = th.cat((result_u, result_c), 1)
-        # result = gumbel_softmax(result, self.dim_action)
         return result
 
 

@@ -50,12 +50,16 @@ writer = SummaryWriter()
 
 for i_episode in range(n_episode):
     # pdb.set_trace()
+    '''
+    # curriculum learning
     if i_episode < 1000:
         obs = env.reset(0)
     elif 1000 <= i_episode < 3000:
         obs = env.reset(1)
     else:
         obs = env.reset(2)
+    '''
+    obs = env.reset(2)
     obs = np.concatenate(obs, 0)
     if isinstance(obs, np.ndarray):
         obs = th.FloatTensor(obs).type(FloatTensor)    # obs in Tensor
