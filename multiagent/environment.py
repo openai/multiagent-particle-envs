@@ -14,6 +14,7 @@ class MultiAgentEnv(gym.Env):
                  observation_callback=None, info_callback=None,
                  done_callback=None, shared_viewer=True):
 
+        self.level = 0
         self.world = world
         self.agents = self.world.policy_agents
         # set required vectorized gym env property
@@ -102,9 +103,12 @@ class MultiAgentEnv(gym.Env):
 
         return obs_n, reward_n, done_n, info_n
 
-    def _reset(self, level=0):
+    def set_level(self, level):
+        self.level = level
+
+    def _reset(self):
         # reset world
-        self.reset_callback(self.world, level=level)
+        self.reset_callback(self.world, level=self.level)
         # reset renderer
         self._reset_render()
         # record observations for each agent

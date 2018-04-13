@@ -29,7 +29,7 @@ class Scenario(BaseScenario):
         self.reset_world(world)
         return world
 
-    def reset_world(self, world):
+    def reset_world(self, world, level=0):
         # assign goals to agents
         for agent in world.agents:
             agent.goal_a = None

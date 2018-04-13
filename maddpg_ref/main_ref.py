@@ -59,7 +59,8 @@ for i_episode in range(n_episode):
     else:
         obs = env.reset(2)
     '''
-    obs = env.reset(2)
+    env.set_level(2)
+    obs = env.reset()
     obs = np.concatenate(obs, 0)
     if isinstance(obs, np.ndarray):
         obs = th.FloatTensor(obs).type(FloatTensor)    # obs in Tensor
