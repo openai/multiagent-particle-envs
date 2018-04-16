@@ -42,12 +42,13 @@ maddpg = MADDPG(n_agents,
                 capacity,
                 episodes_before_train,
                 action_noise="Gaussian_noise",  # ou_noises
-                load_models=None)               # path
+                load_models=path)               # path
 
 FloatTensor = th.cuda.FloatTensor if maddpg.use_cuda else th.FloatTensor
 
 writer = SummaryWriter()
 
+communication_mappings = np.zeros((n_agents, 3, 3))
 for i_episode in range(n_episode):
     # pdb.set_trace()
     '''
@@ -76,6 +77,7 @@ for i_episode in range(n_episode):
           .format(env.world.agents[1].goal_b.name, env.world.agents[1].goal_b.color))
     print("Target landmark for agent 1: {}, Target landmark color: {}"
           .format(env.world.agents[0].goal_b.name, env.world.agents[0].goal_b.color))
+    episode_communications = np.zeros((n_agents, 3))
     for t in range(max_steps):
         env.render()
         # time.sleep(0.05)
@@ -98,6 +100,11 @@ for i_episode in range(n_episode):
         total_reward += sum(reward)
         reward = th.FloatTensor(reward).type(FloatTensor)
 
+        comm_1 = action_np[5:8].argmax()
+        comm_2 = action_np[13:16].argmax()
+        episode_communications[0, comm_1] += 1
+        episode_communications[1, comm_2] += 1
+
         obs_ = np.concatenate(obs_, 0)
         obs_ = th.FloatTensor(obs_).type(FloatTensor)
 
@@ -111,6 +118,10 @@ for i_episode in range(n_episode):
             av_critics_grad += np.array(critics_grad)
             av_actors_grad += np.array(actors_grad)
             n += 1
+    for agent_i in range(2):
+        for goal_i in range(3):
+            if env.world.agents[agent_i].goal_b == env.world.landmarks[goal_i]:
+                communication_mappings[agent_i, goal_i, :] += episode_communications[agent_i, :]
 
     if n != 0:
         av_critics_grad = av_critics_grad / n
