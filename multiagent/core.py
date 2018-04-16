@@ -93,7 +93,7 @@ class World(object):
         # simulation timestep
         self.dt = 0.1
         # physical damping
-        self.damping = 0.25
+        self.damping = 1.0
         # contact response parameters
         self.contact_force = 1e+2
         self.contact_margin = 1e-3
@@ -115,6 +115,8 @@ class World(object):
 
     # update state of the world
     def step(self):
+#        import pdb
+#        pdb.set_trace()
         # set actions for scripted agents 
         for agent in self.scripted_agents:
             agent.action = agent.action_callback(agent, self)

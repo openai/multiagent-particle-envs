@@ -58,6 +58,7 @@ class MADDPG:
             if action_noise == "OU_noise":
                 self.ou_noises = [ou(mu=np.zeros(dim_act_list[i]), x0=states['ou_prevs'][i]) for i in range(n_agents)]
             print('Models loaded!')
+        self.memory = ReplayMemory(capacity)
 
         self.memory = ReplayMemory(capacity)
         self.n_agents = n_agents
@@ -218,7 +219,7 @@ class MADDPG:
                 if self.dim_act_list[i] == 8:
                     noise = th.FloatTensor(np.random.randn(self.dim_act_list[i]) * self.var[i]).type(FloatTensor)
                     noise[-3:] = th.zeros(3).type(FloatTensor)
-                    act += Variable(noise)
+#                    act += Variable(noise)
 
             # decay of action exploration
             if self.episode_done > self.episodes_before_train and self.var[i] > 0.05:

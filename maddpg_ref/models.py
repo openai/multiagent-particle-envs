@@ -35,6 +35,8 @@ class Actor(nn.Module):
         self.FC3 = nn.Linear(nodes, dim_action)
 
     def forward(self, obs):
+#        import pdb
+#        pdb.set_trace()
         result = F.relu(self.FC1(obs))
         result = F.relu(self.FC2(result))
         result = self.FC3(result)
@@ -44,9 +46,10 @@ class Actor(nn.Module):
         elif self.dim_action == 5:
             result = F.tanh(result)
         elif self.dim_action == 8:   # action space with physical & comm action
-            result_u = F.tanh(result[:, :5])
+            result_u = F.relu(result[:, :5])
             result_c = gumbel_softmax(result[:, 5:], 3)
             result = th.cat((result_u, result_c), 1)
+#        print result
         return result
 
 
