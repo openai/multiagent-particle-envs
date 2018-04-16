@@ -172,7 +172,7 @@ class MultiAgentEnv(gym.Env):
                     d = np.argmax(action[0])
                     action[0][:] = 0.0
                     action[0][d] = 1.0
-                if self.discrete_action_space:
+                if self.discrete_action_space:  # enter this block for SL & ref
                     agent.action.u[0] += action[0][1] - action[0][2]
                     agent.action.u[1] += action[0][3] - action[0][4]
                 else:
@@ -188,8 +188,10 @@ class MultiAgentEnv(gym.Env):
             if self.discrete_action_input:
                 agent.action.c = np.zeros(self.world.dim_c)
                 agent.action.c[action[0]] = 1.0
-            else:
-                agent.action.c = action[0]
+            else:   # enter into this block
+                # agent.action.c = action[0]
+                idx = np.argmax(action[0])
+                agent.action.c[idx] = 1.0
             action = action[1:]
         # make sure we used all elements of action
         assert len(action) == 0

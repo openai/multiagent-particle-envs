@@ -35,7 +35,7 @@ episodes_before_train = 50     # 50 ? Not specified in paper
 snapshot_path = "/home/jadeng/Documents/snapshot/SL/"
 # snapshot_path = "/home/jadeng/Desktop/snapshot_SL/"
 snapshot_name = "speaker_listener_latest_episode_"
-path = snapshot_path + snapshot_name + '800'
+path = snapshot_path + snapshot_name + '80'
 
 maddpg = MADDPG(n_agents,
                 dim_obs_list,
@@ -128,7 +128,7 @@ for i_episode in range(n_episode):
         writer.add_scalar('data/listener_actor_gradient', av_actors_grad[1][i], i_episode)
 
     # to save models every 200 episodes
-    if i_episode != 0 and i_episode % 200 == 0:
+    if i_episode != 0 and i_episode % 500 == 0:
         print('Save models!')
         if maddpg.action_noise == "OU_noise":
             states = {'critics': maddpg.critics,
@@ -137,7 +137,6 @@ for i_episode in range(n_episode):
                       'actor_optimizer': maddpg.actor_optimizer,
                       'critics_target': maddpg.critics_target,
                       'actors_target': maddpg.actors_target,
-                      'memory': maddpg.memory,
                       'var': maddpg.var,
                       'ou_prevs': [ou_noise.x_prev for ou_noise in maddpg.ou_noises]}
         else:
@@ -147,7 +146,6 @@ for i_episode in range(n_episode):
                       'actor_optimizer': maddpg.actor_optimizer,
                       'critics_target': maddpg.critics_target,
                       'actors_target': maddpg.actors_target,
-                      'memory': maddpg.memory,
                       'var': maddpg.var}
         th.save(states, snapshot_path + snapshot_name + str(i_episode))
 

@@ -92,6 +92,7 @@ for i_episode in range(n_episode):
         for x in dim_act_list:
             action_ls.append(action_np[idx:(idx+x)])
             idx = x
+        # pdb.set_trace()
         obs_, reward, done, _ = env.step(action_ls)
 
         total_reward += sum(reward)
@@ -139,7 +140,7 @@ for i_episode in range(n_episode):
         writer.add_scalar('data/agent1_actor_gradient', av_actors_grad[1][i], i_episode)
 
     # to save models every 200 episodes
-    if i_episode != 0 and i_episode % 200 == 0:
+    if i_episode != 0 and i_episode % 500 == 0:
         print('Save models!')
         if maddpg.action_noise == "OU_noise":
             states = {'critics': maddpg.critics,
@@ -148,7 +149,6 @@ for i_episode in range(n_episode):
                       'actor_optimizer': maddpg.actor_optimizer,
                       'critics_target': maddpg.critics_target,
                       'actors_target': maddpg.actors_target,
-                      'memory': maddpg.memory,
                       'var': maddpg.var,
                       'ou_prevs': [ou_noise.x_prev for ou_noise in maddpg.ou_noises]}
         else:
@@ -158,7 +158,6 @@ for i_episode in range(n_episode):
                       'actor_optimizer': maddpg.actor_optimizer,
                       'critics_target': maddpg.critics_target,
                       'actors_target': maddpg.actors_target,
-                      'memory': maddpg.memory,
                       'var': maddpg.var}
         th.save(states, snapshot_path + snapshot_name + str(i_episode))
 

@@ -42,7 +42,6 @@ class MADDPG:
             self.critics_target = deepcopy(self.critics)
             self.critic_optimizer = [Adam(x.parameters(), lr=0.0075) for x in self.critics]     # 0.01, 0.005
             self.actor_optimizer = [Adam(x.parameters(), lr=0.0075) for x in self.actors]       # 0.01, 0.005
-            self.memory = ReplayMemory(capacity)
             self.var = [1.0 for i in range(n_agents)]
             if action_noise == "OU_noise":
                 self.ou_noises = [ou(mu=np.zeros(dim_act_list[i])) for i in range(n_agents)]
@@ -55,12 +54,12 @@ class MADDPG:
             self.actor_optimizer = states['actor_optimizer']
             self.critics_target = states['critics_target']
             self.actors_target = states['actors_target']
-            self.memory = states['memory']
             self.var = states['var']
             if action_noise == "OU_noise":
                 self.ou_noises = [ou(mu=np.zeros(dim_act_list[i]), x0=states['ou_prevs'][i]) for i in range(n_agents)]
             print('Models loaded!')
 
+        self.memory = ReplayMemory(capacity)
         self.n_agents = n_agents
         self.batch_size = batch_size
         self.dim_obs_list = dim_obs_list
