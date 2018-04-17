@@ -42,13 +42,12 @@ maddpg = MADDPG(n_agents,
                 capacity,
                 episodes_before_train,
                 action_noise="Gaussian_noise",  # ou_noises
-                load_models=path)               # path
+                load_models=None)               # path
 
 FloatTensor = th.cuda.FloatTensor if maddpg.use_cuda else th.FloatTensor
 
 writer = SummaryWriter()
 
-communication_mappings = np.zeros((n_agents, 3, 3))
 for i_episode in range(n_episode):
     # pdb.set_trace()
     '''
@@ -77,6 +76,9 @@ for i_episode in range(n_episode):
           .format(env.world.agents[1].goal_b.name, env.world.agents[1].goal_b.color))
     print("Target landmark for agent 1: {}, Target landmark color: {}"
           .format(env.world.agents[0].goal_b.name, env.world.agents[0].goal_b.color))
+    consistency_interval = 10
+    if (i_episode % consistency_interval) == 0:
+        communication_mappings = np.zeros((n_agents, 3, 3))
     episode_communications = np.zeros((n_agents, 3))
     for t in range(max_steps):
         env.render()
@@ -117,11 +119,24 @@ for i_episode in range(n_episode):
             av_critics_grad += np.array(critics_grad)
             av_actors_grad += np.array(actors_grad)
             n += 1
-    pdb.set_trace()
-    for agent_i in range(2):
+    for agent_i in range(n_agents):
         for goal_i in range(3):
             if env.world.agents[agent_i].goal_b == env.world.landmarks[goal_i]:
                 communication_mappings[agent_i, goal_i, :] += episode_communications[agent_i, :]
+    
+    if (i_episode % consistency_interval) == consistency_interval - 1:
+        for agent_i in range(n_agents):
+            string = "Agent {}: ".format(agent_i)
+            normalized_agent_mapping = communication_mappings[agent_i,:,:]/np.expand_dims(communication_mappings[agent_i,:,:].sum(1),1)
+            writer.add_scalar('communication/agent{}_det'.format(agent_i),
+                np.linalg.det(normalized_agent_mapping),
+                i_episode)
+            for goal_i in range(3):
+                mapping = communication_mappings[agent_i,goal_i,:]
+                consistency = 0 if mapping.sum() == 0 else mapping.max() / mapping.sum()
+                writer.add_scalar('consistency/agent{}_goal{}'.format(agent_i, goal_i), consistency, i_episode)
+                string += ("{:.1f}% ".format(consistency*100))
+            print(string)
 
     if n != 0:
         av_critics_grad = av_critics_grad / n

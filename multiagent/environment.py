@@ -88,7 +88,7 @@ class MultiAgentEnv(gym.Env):
         for i, agent in enumerate(self.agents):
             self._set_action(action_n[i], agent, self.action_space[i])
             actionstr += str(i) + ":\t {:.2f} {:.2f}".format(agent.action.u[0], agent.action.u[1])
-        print(actionstr)
+#        print(actionstr)
         
         # advance world state
         self.world.step()
@@ -181,7 +181,7 @@ class MultiAgentEnv(gym.Env):
                     agent.action.u[1] += action[0][3] - action[0][4]
                 else:
                     agent.action.u = action[0]
-            sensitivity = 5
+            sensitivity = 5.0
             # sensitivity = 1.0
             if agent.accel is not None:
                 sensitivity = agent.accel
@@ -219,7 +219,7 @@ class MultiAgentEnv(gym.Env):
                     else:
                         word = alphabet[np.argmax(other.state.c)]
                     message += (other.name + ' to ' + agent.name + ': ' + word + '   ')
-            print(message)
+#            print(message)
 
         if close:
             # close any existic renderers

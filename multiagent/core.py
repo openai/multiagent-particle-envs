@@ -115,8 +115,6 @@ class World(object):
 
     # update state of the world
     def step(self):
-#        import pdb
-#        pdb.set_trace()
         # set actions for scripted agents 
         for agent in self.scripted_agents:
             agent.action = agent.action_callback(agent, self)
