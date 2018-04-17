@@ -2,6 +2,7 @@ from torch.autograd import Variable
 from make_env import make_env
 from gym import spaces
 from MADDPG import MADDPG
+import argparse
 import numpy as np
 import torch as th
 from tensorboardX import SummaryWriter
@@ -9,6 +10,26 @@ import torchvision.utils as vutils
 import time
 import pdb
 
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--consistency_interval", type=int, default=10, 
+    help="Number of episodes to tally communications stats over")
+parser.add_argument("--load", type=str, default=None, 
+    help="Path to model to load")
+parser.add_argument("--snapshot_interval", type=int, default=200,
+    help="Episodes between model snapshots")
+parser.add_argument("--snapshot_path", type=str, default="../snapshots/", 
+    help="Path to output model snapshots")
+parser.add_argument("--snapshot_prefix", type=str, default="reference_latest_episode_", 
+    help="Filename prefix of model snapshots")
+
+args = parser.parse_args()
+
+snapshot_interval = args.snapshot_interval
+snapshot_path = args.snapshot_path
+snapshot_prefix = args.snapshot_prefix
+load_models = args.load
+consistency_interval = args.consistency_interval
 
 env = make_env('simple_reference')
 n_agents = len(env.world.agents)
@@ -31,10 +52,6 @@ n_episode = 100000    # 20000
 max_steps = 30    # 35
 episodes_before_train = 50     # 50 ? Not specified in paper
 
-snapshot_path = "../snapshots/"
-snapshot_name = "reference_latest_episode_"
-path = snapshot_path + snapshot_name + '3600'
-
 maddpg = MADDPG(n_agents,
                 dim_obs_list,
                 dim_act_list,
@@ -42,14 +59,13 @@ maddpg = MADDPG(n_agents,
                 capacity,
                 episodes_before_train,
                 action_noise="Gaussian_noise",  # ou_noises
-                load_models=None)               # path
+                load_models=load_models)        # path
 
 FloatTensor = th.cuda.FloatTensor if maddpg.use_cuda else th.FloatTensor
 
 writer = SummaryWriter()
 
 for i_episode in range(n_episode):
-    # pdb.set_trace()
     '''
     # curriculum learning
     if i_episode < 1000:
@@ -76,7 +92,6 @@ for i_episode in range(n_episode):
           .format(env.world.agents[1].goal_b.name, env.world.agents[1].goal_b.color))
     print("Target landmark for agent 1: {}, Target landmark color: {}"
           .format(env.world.agents[0].goal_b.name, env.world.agents[0].goal_b.color))
-    consistency_interval = 10
     if (i_episode % consistency_interval) == 0:
         communication_mappings = np.zeros((n_agents, 3, 3))
     episode_communications = np.zeros((n_agents, 3))
@@ -86,7 +101,6 @@ for i_episode in range(n_episode):
 
         # obs Tensor turns into Variable before feed into Actor
         obs_var = Variable(obs).type(FloatTensor)
-        # pdb.set_trace()
         action = maddpg.select_action(obs_var)      # action in Variable
         action = action[0].data                     # action in Tensor
         action_np = action.cpu().numpy()            # actions in numpy array
@@ -96,7 +110,6 @@ for i_episode in range(n_episode):
         for x in dim_act_list:
             action_ls.append(action_np[idx:(idx+x)])
             idx += x
-        # pdb.set_trace()
         obs_, reward, done, _ = env.step(action_ls)
         total_reward += sum(reward)
         reward = th.FloatTensor(reward).type(FloatTensor)
@@ -165,8 +178,8 @@ for i_episode in range(n_episode):
     for i in range(6):
         writer.add_scalar('data/agent1_actor_gradient', av_actors_grad[1][i], i_episode)
 
-    # to save models every 500 episodes
-    if i_episode != 0 and i_episode % 500 == 0:
+    # to save models every N episodes
+    if i_episode != 0 and i_episode % snapshot_interval == 0:
         print('Save models!')
         if maddpg.action_noise == "OU_noise":
             states = {'critics': maddpg.critics,
@@ -185,7 +198,7 @@ for i_episode in range(n_episode):
                       'critics_target': maddpg.critics_target,
                       'actors_target': maddpg.actors_target,
                       'var': maddpg.var}
-        th.save(states, snapshot_path + snapshot_name + str(i_episode))
+        th.save(states, snapshot_path + "/" + snapshot_prefix + str(i_episode))
 
 writer.export_scalars_to_json("./all_scalars.json")
 writer.close()
