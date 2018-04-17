@@ -16,13 +16,14 @@ class Scenario(BaseScenario):
             agent.name = 'agent %d' % i
             agent.collide = True
             agent.silent = True
-            agent.size = 0.15
+            agent.size = 0.075
         # add landmarks
         world.landmarks = [Landmark() for i in range(num_landmarks)]
         for i, landmark in enumerate(world.landmarks):
             landmark.name = 'landmark %d' % i
             landmark.collide = False
             landmark.movable = False
+            landmark.size = 0.05
         # make initial conditions
         self.reset_world(world)
         return world
@@ -30,7 +31,10 @@ class Scenario(BaseScenario):
     def reset_world(self, world, level=0):
         # random properties for agents
         for i, agent in enumerate(world.agents):
-            agent.color = np.array([0.35, 0.35, 0.85])
+            agent.color = np.array([0.75, 0.75, 1.25])
+        world.agents[0].color = np.array([1.25, 0.75, 0.75])
+        world.agents[1].color = np.array([0.75, 1.25, 0.75])
+        world.agents[2].color = np.array([0.75, 0.75, 1.25])
         # random properties for landmarks
         for i, landmark in enumerate(world.landmarks):
             landmark.color = np.array([0.25, 0.25, 0.25])
@@ -60,7 +64,6 @@ class Scenario(BaseScenario):
                     rew -= 1
                     collisions += 1
         return (rew, collisions, min_dists, occupied_landmarks)
-
 
     def is_collision(self, agent1, agent2):
         delta_pos = agent1.state.p_pos - agent2.state.p_pos

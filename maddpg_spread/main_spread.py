@@ -10,7 +10,7 @@ import time
 import pdb
 
 
-env = make_env('simple_reference')
+env = make_env('simple_spread')
 n_agents = len(env.world.agents)
 dim_obs_list = [env.observation_space[i].shape[0] for i in range(n_agents)]
 
@@ -31,8 +31,8 @@ n_episode = 100000    # 20000
 max_steps = 30    # 35
 episodes_before_train = 50     # 50 ? Not specified in paper
 
-snapshot_path = "/home/jadeng/Documents/snapshot/ref/"
-snapshot_name = "reference_latest_episode_"
+snapshot_path = "/home/jadeng/Documents/snapshot/spread/"
+snapshot_name = "spread_latest_episode_"
 path = snapshot_path + snapshot_name + '800'
 
 maddpg = MADDPG(n_agents,
@@ -70,12 +70,14 @@ for i_episode in range(n_episode):
     av_critics_grad = np.zeros((n_agents, 6))
     av_actors_grad = np.zeros((n_agents, 6))
     n = 0
-    print('Simple Reference')
+    print('Simple Spread')
     print('Start of episode', i_episode)
+    '''
     print("Target landmark for agent 0: {}, Target landmark color: {}"
           .format(env.world.agents[1].goal_b.name, env.world.agents[1].goal_b.color))
     print("Target landmark for agent 1: {}, Target landmark color: {}"
           .format(env.world.agents[0].goal_b.name, env.world.agents[0].goal_b.color))
+    '''
     for t in range(max_steps):
         env.render()
         # time.sleep(0.05)
@@ -121,7 +123,7 @@ for i_episode in range(n_episode):
     print('End of Episode: %d, mean_reward = %f, total_reward = %f' % (i_episode, mean_reward, total_reward))
 
     # plot of reward
-    writer.add_scalar('data/reward_ref', mean_reward, i_episode)
+    writer.add_scalar('data/reward_spread', mean_reward, i_episode)
 
     # plot of agent0 - speaker gradient of critic net
     for i in range(6):
@@ -138,6 +140,14 @@ for i_episode in range(n_episode):
     # plot of agent1 - listener gradient of critics net
     for i in range(6):
         writer.add_scalar('data/agent1_actor_gradient', av_actors_grad[1][i], i_episode)
+
+    # plot of agent2 - listener gradient of critics net
+    for i in range(6):
+        writer.add_scalar('data/agent2_critic_gradient', av_critics_grad[2][i], i_episode)
+
+    # plot of agent2 - listener gradient of critics net
+    for i in range(6):
+        writer.add_scalar('data/agent2_actor_gradient', av_actors_grad[2][i], i_episode)
 
     # to save models every 500 episodes
     if i_episode != 0 and i_episode % 500 == 0:

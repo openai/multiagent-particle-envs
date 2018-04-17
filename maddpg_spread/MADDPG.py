@@ -103,8 +103,6 @@ class MADDPG:
         index_obs = 0
         index_act = 0
         for agent in range(self.n_agents):
-            if self.episode_done > 20000:
-                self.batch_size = 2048
             transitions = self.memory.sample(self.batch_size)
             batch = Experience(*zip(*transitions))
             state_batch = Variable(th.stack(batch.states).type(FloatTensor))
