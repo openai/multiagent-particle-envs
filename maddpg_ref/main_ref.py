@@ -14,7 +14,7 @@ import pdb
 parser = argparse.ArgumentParser()
 parser.add_argument("--consistency_interval", type=int, default=10, 
     help="Number of episodes to tally communications stats over")
-parser.add_argument("--load", type=str, default=None, 
+parser.add_argument("-l", "--load", type=str, default=None, 
     help="Path to model to load")
 parser.add_argument("--snapshot_interval", type=int, default=200,
     help="Episodes between model snapshots")
@@ -22,6 +22,8 @@ parser.add_argument("--snapshot_path", type=str, default="../snapshots/",
     help="Path to output model snapshots")
 parser.add_argument("--snapshot_prefix", type=str, default="reference_latest_episode_", 
     help="Filename prefix of model snapshots")
+parser.add_argument("--print_action", action="store_true")
+parser.add_argument("--print_communication", action="store_true")
 
 args = parser.parse_args()
 
@@ -30,8 +32,11 @@ snapshot_path = args.snapshot_path
 snapshot_prefix = args.snapshot_prefix
 load_models = args.load
 consistency_interval = args.consistency_interval
+print_action = args.print_action
+print_communication = args.print_communication
 
-env = make_env('simple_reference')
+env = make_env('simple_reference', 
+    print_action=print_action, print_communication=print_communication)
 n_agents = len(env.world.agents)
 dim_obs_list = [env.observation_space[i].shape[0] for i in range(n_agents)]
 
