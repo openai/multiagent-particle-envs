@@ -10,6 +10,7 @@ class Scenario(BaseScenario):
         world.dim_c = 2
         num_agents = 3
         num_landmarks = 3
+        world.collaborative = True
         # add agents
         world.agents = [Agent() for i in range(num_agents)]
         for i, agent in enumerate(world.agents):

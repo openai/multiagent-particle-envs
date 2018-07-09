@@ -2,6 +2,7 @@ import gym
 from gym import spaces
 from gym.envs.registration import EnvSpec
 import numpy as np
+from multiagent.multi_discrete import MultiDiscrete
 
 # environment for all agents in the multiagent world
 # currently code assumes that no agents will be created/destroyed at runtime!
@@ -31,7 +32,7 @@ class MultiAgentEnv(gym.Env):
         # if true, even the action is continuous, action will be performed discretely
         self.force_discrete_action = world.discrete_action if hasattr(world, 'discrete_action') else False
         # if true, every agent has the same reward
-        self.shared_reward = False
+        self.shared_reward = world.collaborative if hasattr(world, 'collaborative') else False
         self.time = 0
 
         # configure spaces
@@ -57,7 +58,7 @@ class MultiAgentEnv(gym.Env):
             if len(total_action_space) > 1:
                 # all action spaces are discrete, so simplify to MultiDiscrete action space
                 if all([isinstance(act_space, spaces.Discrete) for act_space in total_action_space]):
-                    act_space = spaces.MultiDiscrete([[0,act_space.n-1] for act_space in total_action_space])
+                    act_space = MultiDiscrete([[0, act_space.n - 1] for act_space in total_action_space])
                 else:
                     act_space = spaces.Tuple(total_action_space)
                 self.action_space.append(act_space)
@@ -144,7 +145,7 @@ class MultiAgentEnv(gym.Env):
         agent.action.u = np.zeros(self.world.dim_p)
         agent.action.c = np.zeros(self.world.dim_c)
         # process action
-        if isinstance(action_space, spaces.MultiDiscrete):
+        if isinstance(action_space, MultiDiscrete):
             act = []
             size = action_space.high - action_space.low + 1
             index = 0

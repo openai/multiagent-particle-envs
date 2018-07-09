@@ -6,14 +6,13 @@ class Scenario(BaseScenario):
     def make_world(self):
         world = World()
         # set any world properties first
-        world.dim_c = 10        
+        world.dim_c = 10
+        world.collaborative = True  # whether agents share rewards
         # add agents
         world.agents = [Agent() for i in range(2)]
         for i, agent in enumerate(world.agents):
             agent.name = 'agent %d' % i
             agent.collide = False
-            # agent.u_noise = 1e-1
-            # agent.c_noise = 1e-1
         # add landmarks
         world.landmarks = [Landmark() for i in range(3)]
         for i, landmark in enumerate(world.landmarks):
@@ -57,29 +56,21 @@ class Scenario(BaseScenario):
         if agent.goal_a is None or agent.goal_b is None:
             return 0.0
         dist2 = np.sum(np.square(agent.goal_a.state.p_pos - agent.goal_b.state.p_pos))
-        return -dist2 #np.exp(-dist2)
+        return -dist2
 
     def observation(self, agent, world):
-        # goal positions
-        # goal_pos = [np.zeros(world.dim_p), np.zeros(world.dim_p)]
-        # if agent.goal_a is not None:
-        #     goal_pos[0] = agent.goal_a.state.p_pos - agent.state.p_pos
-        # if agent.goal_b is not None:
-        #     goal_pos[1] = agent.goal_b.state.p_pos - agent.state.p_pos         
         # goal color
         goal_color = [np.zeros(world.dim_color), np.zeros(world.dim_color)]
-        # if agent.goal_a is not None:
-        #     goal_color[0] = agent.goal_a.color
         if agent.goal_b is not None:
             goal_color[1] = agent.goal_b.color 
 
         # get positions of all entities in this agent's reference frame
         entity_pos = []
-        for entity in world.landmarks: #world.entities:
+        for entity in world.landmarks:
             entity_pos.append(entity.state.p_pos - agent.state.p_pos)
         # entity colors
         entity_color = []
-        for entity in world.landmarks: #world.entities:
+        for entity in world.landmarks:
             entity_color.append(entity.color)
         # communication of all other agents
         comm = []

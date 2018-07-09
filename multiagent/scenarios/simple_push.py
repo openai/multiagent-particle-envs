@@ -1,12 +1,6 @@
 import numpy as np
 from multiagent.core import World, Agent, Landmark
 from multiagent.scenario import BaseScenario
-import random
-
-#
-#     # the non-ensemble version of <ensemble_push>
-#
-#
 
 class Scenario(BaseScenario):
     def make_world(self):
@@ -26,8 +20,6 @@ class Scenario(BaseScenario):
                 agent.adversary = True
             else:
                 agent.adversary = False
-            # agent.u_noise = 1e-1
-            # agent.c_noise = 1e-1
         # add landmarks
         world.landmarks = [Landmark() for i in range(num_landmarks)]
         for i, landmark in enumerate(world.landmarks):
