@@ -7,6 +7,6 @@ pip install gym
 ```
 ## Python files
 ### These files are just using gym, and can be run by ```python filename.py``` (or ```python3 filename.py``` if you are using linux.) IDEs shold be able to run them as well.
-### cheating.py is an straight solution by Mark Yu after 2 second of thinking about this game, it represents Mark's superiority against AI. JK.
-### simpleqlearning.py is an implementation of qlearning that Mark learnt from wikipedia [https://en.wikipedia.org/wiki/Q-learning](https://en.wikipedia.org/wiki/Q-learning). Feel free to mess with the learning rate and discountrate and compare the time it takes for the car to reach the summit.
+### cheating.py is a straight solution by Mark Yu after 2 seconds of thinking, it represents Mark's superiority against AI. JK.
+### simpleqlearning.py is an implementation of qlearning, an algorithm that Mark learnt from wikipedia [https://en.wikipedia.org/wiki/Q-learning](https://en.wikipedia.org/wiki/Q-learning). Feel free to mess with the learning rate and discountrate in the code and compare the time it takes for the AI to learn how to push the car to the summit.
 
