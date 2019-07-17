@@ -1,0 +1,9 @@
+multi_discrete.py:
+- Changed random_array assignment in sample() to use gym.utils.seeding
+rendering.py:
+- The reraise function appears to no longer exist. Fortunately, all this does is add additional information to a raised
+  exception, so should be simple to reimplement (or ignore)
+environment.py:
+- line 234: geom.set_color(*entity.color, alpha=0.5) - receives multiple arguments. This is a pain, because it is
+  expanding the color argument, a 3-tuple or 4-tuple, but we want to set alpha to 0.5. A dumb fix is to make a new
+  tuple with the first three arguments of the color, and 0.5 for alpha.
