@@ -4,6 +4,11 @@ rendering.py:
 - The reraise function appears to no longer exist. Fortunately, all this does is add additional information to a raised
   exception, so should be simple to reimplement (or ignore)
 environment.py:
-- line 234: geom.set_color(*entity.color, alpha=0.5) - receives multiple arguments. This is a pain, because it is
+- line 234: `geom.set_color(*entity.color, alpha=0.5)` - receives multiple arguments. This is a pain, because it is
   expanding the color argument, a 3-tuple or 4-tuple, but we want to set alpha to 0.5. A dumb fix is to make a new
   tuple with the first three arguments of the color, and 0.5 for alpha.
+
+simple_crypto.py:
+- line 121: array in conditional can potentially be a boolean rather than an ndarray so it will have no .all() method
+- line 122: the sizes in the expression `agent.state.c - agent.goal_a.color` are mismatched and it is unclear where they
+  come from
