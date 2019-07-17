@@ -48,7 +48,7 @@ for episode in range(2700):
 
 
         # Simulation ended (for any reson) - if goal position is achived - update Q value with reward directly
-        elif new_state[0] >= env.goal_position:
+        elif new_state[0] >= 0.5:
             print("We make it!")
             print(episode)
             q_table[currentstate + (action,)] = 0
