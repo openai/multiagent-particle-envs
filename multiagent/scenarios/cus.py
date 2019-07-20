@@ -10,7 +10,7 @@ class Scenario(BaseScenario):
     def make_world(self):
         world = World()
         # add agents
-        numberOfAgents = 2;
+        numberOfAgents = 1;
         world.agents = [Agent() for i in range(numberOfAgents)]
         for i, agent in enumerate(world.agents):
             agent.name = 'agent %d' % i
