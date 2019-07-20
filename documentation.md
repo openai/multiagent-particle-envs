@@ -66,7 +66,7 @@ You can create new scenarios by implementing the first 4 functions above (`make_
 
 ## Miscellaneous
 
-- `./multiagent/core.py`: contains classes for various objects (Entities, Landmarks, Agents, etc.) that are used throughout the code.
+- `./multiagent/core.py`: contains classes for various objects (Entities, Landmarks, Agents, etc.) that are used throughout the code.(used for creating a scenario. We might need customized entities, agents for our own scenarios.)
 
 - `./multiagent/rendering.py`: used for displaying agent behaviors on the screen.
 

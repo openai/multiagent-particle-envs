@@ -12,5 +12,12 @@ environment.py:
 
 simple_crypto.py:
 - line 121: array in conditional can potentially be a boolean rather than an ndarray so it will have no .all() method
+    - Similar statements appear on lines 104, 109
 - line 122: the sizes in the expression `agent.state.c - agent.goal_a.color` are mismatched and it is unclear where they
   come from
+    - Similar statements appear on lines 107, 112
+- [Austen] I got it to run by removing the .all() calls and changing lines like 
+        np.sum(np.square(agent.state.c - agent.goal_a.color))
+            to
+        np.square(len(agent.state.c)-len(agent.goal_a.color))
+        Not sure if scenario still functions correctly / if reward calculations are accurate
