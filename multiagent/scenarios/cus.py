@@ -54,7 +54,7 @@ class Scenario(BaseScenario):
         # dist2 = world.landmarks[0].state.p_pos
         delta_pos = agent.state.p_pos - self.agentsToLandMarks[agent].state.p_pos
         dist = np.sqrt(np.sum(np.square(delta_pos)))
-        return dist
+        return -dist
 
     def observation(self, agent, world):
         # get positions of all entities in this agent's reference frame
