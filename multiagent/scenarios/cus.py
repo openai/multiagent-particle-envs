@@ -3,6 +3,10 @@ from multiagent.core import World, Agent, Landmark
 from multiagent.scenario import BaseScenario
 
 class Scenario(BaseScenario):
+    def __init__(self):
+    	super(Scenario, self).__init__()
+    	self.agentsToLandMarks = None
+    	
     def make_world(self):
         world = World()
         # add agents
