@@ -4,7 +4,7 @@ In a simulation with `n` agents:
 
 1. bin/script.py loads - acts as main script
 2. Loads scenario
-    - `./multiagent/scenarios/scenario.py.make_world()`
+    - `./multiagent/scenario.py.make_world()`
 3. Loads multi-agent enviroment given scenario settings and world
     - `./multiagent/environment.py.MultiAgentEnv(Scenario.world())`
 4. Renders environment (initial render)
