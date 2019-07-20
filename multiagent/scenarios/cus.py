@@ -5,22 +5,27 @@ from multiagent.scenario import BaseScenario
 class Scenario(BaseScenario):
     def __init__(self):
     	super(Scenario, self).__init__()
-    	self.agentsToLandMarks = None
-    	
+    	self.agentsToLandMarks = {}
+
     def make_world(self):
         world = World()
         # add agents
-        world.agents = [Agent() for i in range(1)]
+        numberOfAgents = 2;
+        world.agents = [Agent() for i in range(numberOfAgents)]
         for i, agent in enumerate(world.agents):
             agent.name = 'agent %d' % i
             agent.collide = False
             agent.silent = True
         # add landmarks
-        world.landmarks = [Landmark() for i in range(1)]
+        world.landmarks = [Landmark() for i in range(numberOfAgents)]
         for i, landmark in enumerate(world.landmarks):
             landmark.name = 'landmark %d' % i
             landmark.collide = False
             landmark.movable = False
+        #fill in the dictionary
+        for i in range(numberOfAgents):
+        	self.agentsToLandMarks.update({ world.agents[i]: world.landmarks[i] })
+
         # make initial conditions
         self.reset_world(world)
         return world
@@ -45,7 +50,7 @@ class Scenario(BaseScenario):
     def reward(self, agent, world):
         # dist2 = np.sum(np.square(agent.state.p_pos - world.landmarks[0].state.p_pos))
         # dist2 = world.landmarks[0].state.p_pos
-        delta_pos = agent.state.p_pos - world.landmarks[0].state.p_pos
+        delta_pos = agent.state.p_pos - self.agentsToLandMarks[agent].state.p_pos
         dist = np.sqrt(np.sum(np.square(delta_pos)))
         return dist
 
