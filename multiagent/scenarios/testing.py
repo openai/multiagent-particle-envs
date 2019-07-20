@@ -8,11 +8,11 @@ class Scenario(BaseScenario):
     def make_world(self):
         world = World()	#World has agents and landmarks
         # set any world properties first
-        world.dim_c = 2
-        num_agents = 5
+        world.dim_c = 0
+        num_agents = 2      #Change this to add agents
         world.num_agents = num_agents
         num_adversaries = 0
-        num_landmarks = num_agents - 1
+        num_landmarks = num_agents
         # add agents
         world.agents = [Agent() for i in range(num_agents)]
         for i, agent in enumerate(world.agents):
@@ -45,14 +45,14 @@ class Scenario(BaseScenario):
         goal.color = np.array([0.15, 0.65, 0.15])
         for agent in world.agents:
             agent.goal_a = goal
-        # set random initial states
+        # set random initial states     TODO: Initialize agents + landmarks to set positions with 0 velocity
         for agent in world.agents:
             agent.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
-            agent.state.p_vel = np.zeros(world.dim_p)
+            agent.state.p_vel = 0
             agent.state.c = np.zeros(world.dim_c)
         for i, landmark in enumerate(world.landmarks):
             landmark.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
-            landmark.state.p_vel = np.zeros(world.dim_p)
+            landmark.state.p_vel = 0
 
     def benchmark_data(self, agent, world):
         # returns data for benchmarking purposes
@@ -77,7 +77,7 @@ class Scenario(BaseScenario):
         # Agents are rewarded based on minimum agent distance to each landmark
         return self.adversary_reward(agent, world) if agent.adversary else self.agent_reward(agent, world)
 
-    def agent_reward(self, agent, world):
+    def agent_reward(self, agent, world):   #TODO: set reward to distance to goal landmark, remove adversary stuff
         # Rewarded based on how close any good agent is to the goal landmark, and how far the adversary is from it
         shaped_reward = True
         shaped_adv_reward = True
@@ -129,7 +129,7 @@ class Scenario(BaseScenario):
         entity_color = []
         for entity in world.landmarks:
             entity_color.append(entity.color)
-        # communication of all other agents
+        # communication of all other Agents    TODO: remove communication
         other_pos = []
         for other in world.agents:
             if other is agent: continue
