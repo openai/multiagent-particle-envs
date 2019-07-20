@@ -62,7 +62,7 @@ A BaseScenario `multiagent/scenario.py` incorporates at least `make_world()` and
     4) `observation(agent, world)`: defines the observation space of a given agent
     5) (optional) `benchmark_data()`: provides diagnostic data for policies trained on the environment (e.g. evaluation metrics)
 
-You can create new scenarios by implementing the first 4 functions above (`make_world()`, `reset_world()`, `reward()`, and `observation()`).
+You can create new scenarios by implementing the first 4 functions above (`make_world()`, `reset_world()`, `reward()`, and `observation()`), and have to keep the same function signature(can't not change parameters).
 
 ## Miscellaneous
 
