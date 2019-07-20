@@ -6,7 +6,7 @@ from multiagent.scenario import BaseScenario
 class Scenario(BaseScenario):
 
     def make_world(self):
-        world = World()
+        world = World()	#World has agents and landmarks
         # set any world properties first
         world.dim_c = 2
         num_agents = 5
@@ -104,8 +104,9 @@ class Scenario(BaseScenario):
                 pos_rew += 5
             pos_rew -= min(
                 [np.sqrt(np.sum(np.square(a.state.p_pos - a.goal_a.state.p_pos))) for a in good_agents])
-        return pos_rew + adv_rew
+        return pos_rew + adv_rew   #Rewards are a simple int
 
+    #Adversaries are given rewards
     def adversary_reward(self, agent, world):
         # Rewarded based on proximity to the goal landmark
         shaped_reward = True
@@ -118,6 +119,7 @@ class Scenario(BaseScenario):
             return adv_rew
 
 
+    #What is passed to the agent ie How they see the world
     def observation(self, agent, world):
         # get positions of all entities in this agent's reference frame
         entity_pos = []
