@@ -10,7 +10,7 @@ class Scenario(BaseScenario):
     def make_world(self):
         world = World()
         # add agents
-        numberOfAgents = 1;
+        numberOfAgents = 2;
         world.agents = [Agent() for i in range(numberOfAgents)]
         for i, agent in enumerate(world.agents):
             agent.name = 'agent %d' % i
@@ -36,15 +36,17 @@ class Scenario(BaseScenario):
             agent.color = np.array([0.25,0.25,0.25])
         # random properties for landmarks
         for i, landmark in enumerate(world.landmarks):
-            landmark.color = np.array([0.75,0.75,0.75])
+            landmark.color = np.array([0.75,0.25,0.25])
         world.landmarks[0].color = np.array([0.75,0.25,0.25])
         # set random initial states
-        for agent in world.agents:
-            agent.state.p_pos = np.random.uniform(-1,+1, world.dim_p)
+        for i,agent in enumerate(world.agents):
+            # agent.state.p_pos = np.random.uniform(-1,+1, world.dim_p)
+            agent.state.p_pos = np.array([i/2,0])
             agent.state.p_vel = np.zeros(world.dim_p)
             agent.state.c = np.zeros(world.dim_c)
         for i, landmark in enumerate(world.landmarks):
-            landmark.state.p_pos = np.random.uniform(-1,+1, world.dim_p)
+            # landmark.state.p_pos = np.random.uniform(-1,+1, world.dim_p)
+            landmark.state.p_pos = np.array([i/2,0.75])
             landmark.state.p_vel = np.zeros(world.dim_p)
 
     def reward(self, agent, world):
