@@ -8,3 +8,7 @@ class BaseScenario(object):
     # create initial conditions of the world
     def reset_world(self, world):
         raise NotImplementedError()
+    def reward(self, agent, world):
+    	raise NotImplementedError()
+    def observation(self, agent, world):
+    	raise NotImplementedError()
