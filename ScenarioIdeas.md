@@ -5,7 +5,7 @@ Generated at: https://www.tablesgenerator.com/markdown_tables
 |  | Possible Actions | Rewards per Outcome | Properties of other entities | Nash Equilibrium | Other Notes |
 |----|-----------------------|--------------------------------------------------------------------------------------------------------------------------|-------------------------------------|-------------------------|-------------|
 | #1 | Expand, attack, trade | Expanding + attacking spends resources for greater resource bonuses later. Trading gives bonus resources for both agents | No other entities other than agents | Attack |  |
-| #2 | Move x steps | Agents try to close distance to flag | No other entities other than agents | Move as far as possible |  |
+| #2 | Move x steps | Reward = progress in last step | No other entities other than agents | Move as far as possible |  |
 | #3 |  |  |  |  |  |
 | #4 |  |  |  |  |  |
 | #5 |  |  |  |  |  |
@@ -22,4 +22,7 @@ If A attacks B, spending 5 resources; B attacks A spending 6 resources, B takes 
 Add defend action, which blocks attack, but opponent agent gains bigger bonus resource if they try to trade. 
 
 ## Idea 2. Race
-2D plane where agents try to race to their landmark. Agents can take any x number of steps to advance to the landmark. If the sum of all the steps taken by the agents(y) exceeds z, then all agents that moved get moved backwards w steps. Agents are rewarded for reaching the landmark. Parameters y, z, and the initial distance for each agent to the landmark can be varied for balance and to compare agent behavior.
+2D plane where agents try to race to their landmark. Agents can take any x number of steps to advance to the landmark. If the sum of all the steps taken by the agents(y) exceeds z, then all agents that moved get moved backwards w steps. ~~Agents are rewarded for reaching the landmark~~ Agents are rewarded based off of how many steps they are able to take per turn. Parameters y, z, and the initial distance for each agent to the landmark can be varied for balance and to compare agent behavior.
+
+- The landmarks don't actually get taken into account for the rewards or observation, it's simply a visualization of how much progess each agent is able to make.
+- Agents will either have to be moved by the scenario via physics, or they can move based off of the reward recieved on their next action, the following turn.
