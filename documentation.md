@@ -70,3 +70,8 @@ You can create new scenarios by implementing the first 4 functions above (`make_
 
 - `./multiagent/rendering.py`: used for displaying agent behaviors on the screen.
 
+## Visualization:
+
+1. Each agent will have one corresponding window generated for itself, agents always locate at the center of the camera in     its own wondow.    
+2.  In the interactive policy, pressing -> will make the agent go left in the world, but everything else goes right in its  own window(since it's always at the center of its own window).  
+
