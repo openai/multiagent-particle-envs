@@ -4,7 +4,8 @@ from multiagent.scenario import BaseScenario
 
 
 class Scenario(BaseScenario):
-    goalDist = 5.0;
+    goalDist = 5.0; #Currently the distance to landmark
+
     def make_world(self):
         world = World()	#World has agents and landmarks
         # set any world properties first
@@ -72,7 +73,7 @@ class Scenario(BaseScenario):
 
     #Simplified to just distance from y = 5;
     def reward(self, agent, world):
-        alpha = 0.5
+        alpha = 0.5 #Can be adjusted to determine whether individual performance, or ranked importance is more important [0,1]
         return alpha * agent.state.p_pos[1] - (1-alpha) * 1/(world.num_agents-1)*sum([other.state.p_pos[1] for other in world.agents if other is not agent])
         #Right now + for distance - average of the distance covered by other agents.
 
