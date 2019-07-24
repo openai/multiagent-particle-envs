@@ -7,7 +7,7 @@ Generated at: https://www.tablesgenerator.com/markdown_tables
 | #1   | Expand, attack, trade   | Expanding + attacking spends resources for greater resource bonuses later.                                                 | No other entities other than agents   | Attack                    |               |
 |      |                         | Trading gives bonus resources for both agents                                                                              |                                       |                           |               |
 | #2   | Move x steps            | Reward = progress in last step                                                                                             | No other entities other than agents   | Move as far as possible   |               |
-| #3   |                         |                                                                                                                            |                                       |                           |               |
+| #3   | move, attack, loot, rest |  Staying alive, get gear, kills, winning                                                                                                         |     No other entities other than agents                                 |     live and loot                      |              |
 | #4   |                         |                                                                                                                            |                                       |                           |               |
 | #5   |                         |                                                                                                                            |                                       |                           |               |
 
@@ -41,3 +41,57 @@ Add defend action, which blocks attack, but opponent agent gains bigger bonus re
 #### Notes
 - The landmarks don't actually get taken into account for the rewards or observation, it's simply aiding visualization of how much progess each agent is able to make.
 - Agents will either have to be moved by the scenario via physics, or they can move based off of the reward recieved on their next action, the following turn.
+
+## Idea 3. Hunger Games
+
+#### World
+- 10 x 10 plane where agents try to be the last survivor
+- 12 agents start equidistant from each other in a circle
+    - Middle of circle is high tier loot
+- Set loot spawns with a set tier, but random loot
+- Structures agents can enter and be hidden from sight
+
+#### Agent
+- Main Attributes
+    - Attack Range
+    - Attack Power
+    - Def
+    - HP
+    - Stamina
+- Choices:
+    - Loot
+        - Sight limited
+    - Attack an adjacent agent
+        - Additional attack options possible with certain loot
+        - Uses Stamina
+    - Move
+        - Walk one space
+        - Run 2x fast w/ Stamina
+    - Rest
+        - Recover HP/Stamina
+#### Rewards
+- Kills are not intrinsically rewarded
+- Looting from chests/bodies result in a set reward value per tier/killcount, and additional reward from net stat gain
+- Time alive gives slight reward with each tick
+- Winning gives the highest reward
+
+#### Agent Variables
+- Environment Knowledge
+    - Excludes:
+        Chest loot status
+        Chest loot items
+        Alive/Dead Enemy location
+- Sight
+- Self position
+- Attributes
+- Loot
+- Kill count
+- Kill counts of other agents
+- List of Alive Agents
+- List of Dead Agents
+- Attributes of agents in Sight
+    
+#### Notes
+- Co-op can be implemented where agents spawn with a teammate they cannot attack, and exchange loot with.
+- Combat can function similarly to D&D involving some RNG
+
