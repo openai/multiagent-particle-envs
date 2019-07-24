@@ -111,4 +111,5 @@ The Idea is extended from the hunger game
 - Kills are rewarded(granted points or not)  
 - ships are rewarded(one ship is worth 1 point)  
 #### Notes  
-- Co-op can be implemented in the way that share sight  
+- Co-op can be implemented in the way that share sight with allay
+- Co-op can still attack each other
