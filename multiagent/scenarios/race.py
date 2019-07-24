@@ -47,9 +47,20 @@ class Scenario(BaseScenario):
             landmark.state.p_vel = np.zeros(world.dim_p)
 
     def reward(self, agent, world):
-        #dist2 = np.sum(np.square(agent.state.p_pos - world.landmarks[0].state.p_pos))
-        dist2 = np.sum(np.square(agent.state.p_pos - np.array([agent.state.p_pos[0], 5.0])))
-        return -dist2
+        # dist2 = np.sum(np.square(agent.state.p_pos - np.array([agent.state.p_pos[0], 5.0])))
+        agentCheated = False
+        theOtherAgentCheated = False
+        if agentCheated and theOtherAgentCheated:
+            return 1
+        if agentCheated and !theOtherAgentCheated:
+            return 5
+        if !agentCheated and theOtherAgentCheated:
+            return -3
+        else:
+            return 3
+        # if !agentCheated and !theOtherAgentCheated:
+        #     return 3
+        # return -dist2
 
     def observation(self, agent, world):
         # get positions of all entities in this agent's reference frame
