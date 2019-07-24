@@ -95,3 +95,20 @@ Add defend action, which blocks attack, but opponent agent gains bigger bonus re
 - Co-op can be implemented where agents spawn with a teammate they cannot attack, and exchange loot with.
 - Combat can function similarly to D&D involving some RNG
 
+## Idea 4. Warship Survival Game  
+The Idea is extended from the hunger game  
+#### World  
+100 x 100 plane where agents try to be the last survivor  
+Every agent was assigned 5 blocks as ships in the plane.  
+when every blocks are eliminated, the agents are terminated  
+The agent has sight within 5 blocks which it can attack  
+#### Main Attributes:  
+points: every round each agent is assigned 5 points  
+Attack: use 2 point to attack a block in the 2-D plane(no range limitation)  
+Move: use 1 point to move one ship into nearby block  
+generate new ships:use 4 points put an new ship into plane  
+#### Rewards  
+Kills are rewarded(granted points or not)  
+ships are rewarded(one ship is worth 1 point)  
+#### Notes  
+Co-op can be implemented in the way that share sight  
