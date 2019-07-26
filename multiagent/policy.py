@@ -34,12 +34,12 @@ class InteractivePolicy(Policy):
             if self.move[3]: u = 3
         else:
             u = np.zeros(5) # 5-d because of no-move action
-            if self.move[0]: u[1] += 0.01
-            if self.move[1]: u[2] += 0.01
-            if self.move[3]: u[3] += 0.01
-            if self.move[2]: u[4] += 0.01
+            if self.move[0]: u[1] += 1.0
+            if self.move[1]: u[2] += 1.0
+            if self.move[3]: u[3] += 1.0
+            if self.move[2]: u[4] += 1.0
             if True not in self.move:
-                u[0] += 0.01
+                u[0] += 1.0
         return np.concatenate([u, np.zeros(self.env.world.dim_c)])
 
     # keyboard event callbacks
