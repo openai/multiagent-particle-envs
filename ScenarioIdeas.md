@@ -2,14 +2,13 @@
 
 Generated at: https://www.tablesgenerator.com/markdown_tables
 
-|      | Possible Actions        | Rewards per Outcome                                                                                                        | Properties of other entities          | Nash Equilibrium          | Other Notes   |
-| ---- | ----------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- | ------------------------- | ------------- |
-| #1   | Expand, attack, trade   | Expanding + attacking spends resources for greater resource bonuses later.                                                 | No other entities other than agents   | Attack                    |               |
-|      |                         | Trading gives bonus resources for both agents                                                                              |                                       |                           |               |
-| #2   | Move x steps            | Reward = progress in last step                                                                                             | No other entities other than agents   | Move as far as possible   |               |
-| #3   | move, attack, loot, rest |  Staying alive, get gear, kills, winning                                                                                                         |     No other entities other than agents                                 |     live and loot                      |              |
-| #4   |                         |                                                                                                                            |                                       |                           |               |
-| #5   |                         |                                                                                                                            |                                       |                           |               |
+|  | Possible Actions | Rewards per Outcome | Properties of other entities | Nash Equilibrium | Things to change |
+|----|--------------------------|--------------------------------------------------------------------------------------------------------------------------|-------------------------------------|---------------------------------------------------------|------------------------------------------------------|
+| #1 | Expand, attack, trade | Expanding + attacking spends resources for greater resource bonuses later. Trading gives bonus resources for both agents | No other entities other than agents | Attack | Edit Core.py, probably environment.py + new scenario |
+| #2 | Move x steps | Reward increases as distance to goal decreases | No other entities other than agents | Move as far as possible | Slightly edit physics in core.py + new scenario |
+| #3 | move, attack, loot, rest | Staying alive, get gear, kills, winning | No other entities other than agents | Live and Loot | Edit Core.py, probably environment.py + new scenario |
+| #4 | Similar to 3 but simpler |  |  |  |  |
+| #5 | Move + comm | Prey evade predators, rewarded by staying alive, predators catch prey, rewarded by catching more prey | Prey vs Predators | Trick other members of group into doing the wrong thing | Shouldn't have to change core.py, just new scenario |
 
 # Details:
 ## Idea 1. (Risk but on a grid)
@@ -113,3 +112,14 @@ The Idea is extended from the hunger game
 #### Notes  
 - Co-op can be implemented in the way that share sight with allay
 - Co-op can still attack each other
+
+## Idea 5. Predator-Prey
+### World
+- Plane with prey + predators
+- Prey and Predators have limited view of their surroundings
+- Each group of agents can communicate within their group
+### Rewards
+- Predators are rewarded per kill
+- Prey are rewarded until they get killed
+### Notes
+- Rewards can be altered such that predators are negatively rewarded if another predator catches a prey and/or prey is positively rewarded if another prey is caught
