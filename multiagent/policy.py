@@ -26,28 +26,6 @@ class InteractivePolicy(Policy):
 
     def action(self, obs):
         # ignore observation and just act based on keyboard events
-
-        
-        #x_axis = self.env.agents[self.agent_index].state.p_pos[0]
-        #y_axis = self.env.agents[self.agent_index].state.p_pos[1]
-
-        # if obs[2] < 0:
-        #     self.move[1] = True
-        # elif obs[2] > 0:
-        #     self.move[0] = True
-        # else:
-        #     self.move[0] = False
-        #     self.move[1] = False
-
-        # if obs[3] > 0:
-        #     self.move[3] = True
-        # elif obs[3] < 0:
-        #     self.move[2] = True
-        # else:
-        #     self.move[2] = False
-        #     self.move[3] = False
-        
-
         if self.env.discrete_action_input:
             u = 0
             if self.move[0]: u = 1
