@@ -1,6 +1,4 @@
-**Status:** Code in active development for a class project at the Rensselaer Polytechnic Institute
-
-- Most team communication done via mattermost at chat.rcos.io
+**Status:** Archive (code is provided as-is, no updates expected)
 
 # Multi-Agent Particle Environment
 
