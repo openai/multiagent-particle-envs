@@ -123,3 +123,22 @@ The Idea is extended from the hunger game
 - Prey are rewarded until they get killed
 ### Notes
 - Rewards can be altered such that predators are negatively rewarded if another predator catches a prey and/or prey is positively rewarded if another prey is caught
+
+# In engine ideas:
+## Notes:
+To implement a competition/cooperation scenario with the given engine, usually the distribution of rewards is a way to encourage either of the 2 behaviors. The researchers were able to create cooperative agents by rewarding the agents as a group when they collectively accomplished a goal. To promote both cooperation and competition, in addition to group rewards there needs to be individual rewards that rewards the individual that completed some goal. 
+
+## Pacman:
+Version of predator prey where prey try to eat up all the pellets while predators try to catch them. \
+Predator rewards: group rewards when prey is caught, individual reward for the specific predator that caught the prey \
+Prey rewards: group rewards when all of pellets are eaten, individual reward for each pellet eaten, negative reward for being caught by predator
+### Possible vatiations:
+Predators could only be group rewarded when all prey is caught, and prey could be group rewarded when any prey eats a pellet.
+
+## Predator pray alteration:
+Add individual benefits for predators that catch the prey
+Add group reward for prey when more of them survive
+
+## Watering hole:
+Landmarks contain finite resources, agents roam and are rewarded for being at a landmark, landmarks lose whatever resources they give to whatever agents are within their radius. The more agents in the radius, the faster the landmarks deplete. Game ends when 1 of the landmarks lose all of its resources.
+
