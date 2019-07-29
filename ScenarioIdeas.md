@@ -140,5 +140,9 @@ Add individual benefits for predators that catch the prey
 Add group reward for prey when more of them survive
 
 ## Watering hole:
-Landmarks contain finite resources, agents roam and are rewarded for being at a landmark, landmarks lose whatever resources they give to whatever agents are within their radius. The more agents in the radius, the faster the landmarks deplete. Game ends when 1 of the landmarks lose all of its resources.
+Landmarks contain finite resources, agents roam and are rewarded for being at a landmark, landmarks lose whatever resources they give to whatever agents are within their radius. The more agents in the radius, the faster the landmarks deplete. Game ends when 1 of the landmarks lose all of its resources. \
+Agents would overall be better off if they each split off and took down different landmarks (without finishing it off), however the nash equilibrium would have them flock to the large ones and potentially risk the landmark running out of resources as moving between landmarks is time wasted. \
+### Note:
+This might require an addition to core.py which would not revoke functionality from the other scenarios, but it is still a change nontheless.
+
 
