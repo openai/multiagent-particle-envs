@@ -92,7 +92,7 @@ You can create new scenarios by implementing the first 4 functions above (`make_
      - AgentState added self.c (communication) attribute. 
   - Action ( All attributes are public. ) :  
     - Action of a given agent. Action is changed  by the the _set_action method in the MultiAgentEnv class (in environment.py), and processed by the "integrate-state" method in World class. The _set_action method needs the new action to be passed to it as an argument. New actions need to be determined in the main script, and then pass to MultiAgentEnv's step method, which then calls _set_action.
-    - How is new action of each agent determined  in each step? In this library, they use a policy class to determine agents policy. If developers are writing their own main script, the new action can be handled by any class, as long as the new action is available in the main script and gets passed to MultiAgentEnv's step() method.
+    - How is new action of each agent determined  in each step? In this library, a policy class is used to determine agents policy. If developers are writing their own main script, the new action can be handled by any class, as long as the new action is available in the main script and gets passed to MultiAgentEnv's step() method.
     - Contains physical action of agents : self.u, which is a [float, float] list.
     - Contains communication action of agents: self.c
   - World ( All attributes are public. ) :
