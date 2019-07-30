@@ -5,20 +5,20 @@ from multiagent.scenario import BaseScenario
 
 class Scenario(BaseScenario):
 
-	#Changeable parameters to promote Game Theory
-	numPrey = 1				#Number of prey (runners)
-	numPredators = 3		#Number of predators (catchers)
-	preyIndRew = 1			#Negative Reward multiplier that prey get individually for being caught 
-	preyGroupRew = 0		#Negative Reward multiplier that prey get for another prey being caught
-	predIndRew = 1			#Reward multiplier that predators get individually for catching prey
-	predGroupRew = 1		#Reward multiplier that predators get for another predator catching prey
+    #Changeable parameters to promote Game Theory
+    numPrey = 1    #Number of prey (runners)
+    numPredators = 3    #Number of predators (catchers)
+    preyIndRew = 1    #Negative Reward multiplier that prey get individually for being caught 
+    preyGroupRew = 0    #Negative Reward multiplier that prey get for another prey being caught
+    predIndRew = 1    #Reward multiplier that predators get individually for catching prey
+    predGroupRew = 1    #Reward multiplier that predators get for another predator catching prey
 
     def make_world(self):
         world = World()
         # set any world properties first
         world.dim_c = 2
-        num_good_agents = this.numPrey
-        num_adversaries = this.numPredators
+        num_good_agents = self.numPrey
+        num_adversaries = self.numPredators
         num_agents = num_adversaries + num_good_agents
         num_landmarks = 2
         # add agents
@@ -106,10 +106,10 @@ class Scenario(BaseScenario):
         if agent.collide:
             for a in adversaries:
                 if self.is_collision(a, agent):
-                    rew -= 10 * this.preyIndRew
+                    rew -= 10 * self.preyIndRew
                 for b in self.good_agents(world):
-	                if agent != b and self.is_collision(a, b):
-	                    rew -= 10 * this.preyGroupRew
+                    if agent != b and self.is_collision(a, b):
+                        rew -= 10 * self.preyGroupRew
 
         # agents are penalized for exiting the screen, so that they can be caught by the adversaries
         def bound(x):
@@ -135,11 +135,11 @@ class Scenario(BaseScenario):
                 rew -= 0.1 * min([np.sqrt(np.sum(np.square(a.state.p_pos - adv.state.p_pos))) for a in agents])
         if agent.collide:
             for ag in agents:
-            	if self.is_collision(ag,agent):
-            		rew += 10 * predIndRew
+                if self.is_collision(ag,agent):
+                    rew += 10 * self.predIndRew
                 for adv in adversaries:
                     if adv != agent and self.is_collision(ag, adv):
-                        rew += 10 * predGroupRew
+                        rew += 10 * self.predGroupRew
         return rew
 
     def observation(self, agent, world):
