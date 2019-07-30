@@ -48,9 +48,9 @@ class Scenario(BaseScenario):
         theOtherAgentCheated = False
         if agentCheated and theOtherAgentCheated:
             return 1
-        if agentCheated and !theOtherAgentCheated:
+        if agentCheated and theOtherAgentCheated == False:
             return 5
-        if !agentCheated and theOtherAgentCheated:
+        if agentCheated == False and theOtherAgentCheated:
             return -3
         else:
             return 3
