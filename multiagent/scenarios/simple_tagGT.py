@@ -13,9 +13,6 @@ class Scenario(BaseScenario):
 	predIndRew = 1			#Reward multiplier that predators get individually for catching prey
 	predGroupRew = 1		#Reward multiplier that predators get for another predator catching prey
 
-
-
-
     def make_world(self):
         world = World()
         # set any world properties first
