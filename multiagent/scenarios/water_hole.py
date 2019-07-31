@@ -91,10 +91,10 @@ class Scenario(BaseScenario):
         entity_pos = []
         for entity in world.landmarks:  # world.entities:
             entity_pos.append(entity.state.p_pos - agent.state.p_pos)
-        # entity colors
-        entity_color = []
+        # entity size
+        entity_size = []
         for entity in world.landmarks:  # world.entities:
-            entity_color.append(entity.color)
+            entity_size.append(entity.size)
         # communication of all other agents
         comm = []
         other_pos = []
@@ -102,4 +102,4 @@ class Scenario(BaseScenario):
             if other is agent: continue
             comm.append(other.state.c)
             other_pos.append(other.state.p_pos - agent.state.p_pos)
-        return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos + comm)
+        return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + entity_size + other_pos + comm)
