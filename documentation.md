@@ -75,7 +75,7 @@ You can create new scenarios by implementing the first 4 functions above (`make_
 1. Each agent will have one corresponding window generated for itself, agents always locate at the center of the camera in     its own wondow.    
 2.  In the interactive policy, pressing -> will make the agent go left in the world, but everything else goes right in its  own window(since it's always at the center of its own window).  
 
-## More Details:  
+## Implementation Details:  
 ### core.py :  
 - Overview:  this class contains implementation of a world other scenarios are build upon. This world has 2 type of entities defined: landmarks and agents and it keeps track of each entities states. Landmarks are immovable by default, which means it will never move even a collision happens to it. Agents have 2 types of actions: physical actions and communication actions. Physical actions are forces agents want to exert on themselves, but their physical actions are not their final force, because collisions might happen.  Communication actions are not handled in this class and not found to be handled in other classes in the library yet.
 - classes:
@@ -108,3 +108,6 @@ You can create new scenarios by implementing the first 4 functions above (`make_
       5.  integrate_state(self, p_force): this method updates each movable entities' velocity according to the p_force, and then update each movable entity's position based on its velocity and this world's time step(default 0.1).
       6.  update_agent_state(self, agent): this method updates a given agent's communication state according to agent's current communication action and a randomly generated noise(a list of values.). If agent is silent , agent's communication state is a list of zero values. 
     - Relation with environment:  The MultiAgentEnv class has an attribute which is a World object. The environment calls World.step() in MultiAgentEnv.step(), to update states of all entities in this world.
+## Extra Notice
+### Compatiability:
+The Scenario.py must be run under Linux System, the windows prompt will leads to unknown bugs
