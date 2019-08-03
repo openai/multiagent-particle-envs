@@ -72,6 +72,7 @@ class Scenario(BaseScenario):
 
     def reward(self, agent, world):
         # Agents are rewarded based on colliding with bigger landmarks and landmarks distribute points based on size and num agents collided, penalized for collisions
+        # observation(self,agent,world)
         rew = 0
         for l in world.landmarks:
         	if self.is_collision(l,agent):
@@ -102,4 +103,8 @@ class Scenario(BaseScenario):
             if other is agent: continue
             comm.append(other.state.c)
             other_pos.append(other.state.p_pos - agent.state.p_pos)
-        return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + entity_size + other_pos + comm)
+        print(type(entity_pos))
+        print(type(entity_size))
+        print(type(entity_pos[0]))
+        print(type(entity_size[0]))
+        return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + [entity_size] + other_pos + comm)
