@@ -86,6 +86,7 @@ class MultiAgentRaceEnv(gym.Env):
         # set action for each agent
         for i, agent in enumerate(self.agents):
             self._set_action(action_n[i], agent, self.action_space[i])
+            # print(agent.action.u)
         # set actions for scripted agents 
         for agent in self.world.scripted_agents:
             agent.action = agent.action_callback(agent, self)
@@ -94,14 +95,15 @@ class MultiAgentRaceEnv(gym.Env):
         # record observation for each agent
         for agent in self.agents:
             obs_n.append(self._get_obs(agent))
-            reward_n.append(self._get_reward(agent))
+            # reward_n.append(self._get_reward(agent))
             done_n.append(self._get_done(agent))
 
             info_n['n'].append(self._get_info(agent))
-
+        # print(reward_n)
         # all agents get total reward in cooperative case
-        reward = np.sum(reward_n)
+        reward_n = self._get_reward(self.agents[0])
         if self.shared_reward:
+            reward = np.sum(reward_n)
             reward_n = [reward] * self.n
 
         # advance world state
@@ -181,7 +183,7 @@ class MultiAgentRaceEnv(gym.Env):
                     agent.action.u[1] += action[0][3] - action[0][4]
                 else:
                     agent.action.u = action[0]
-            sensitivity = 5.0
+            sensitivity = 0.1
             if agent.accel is not None:
                 sensitivity = agent.accel
             agent.action.u *= sensitivity
