@@ -1,6 +1,8 @@
 **Status:** Code in active development for a class project at the Rensselaer Polytechnic Institute
 
 - Most team communication done via mattermost at chat.rcos.io
+- The working directory is in development branch
+- The scenario in development branch is not yet tested
 
 # Multi-Agent Particle Environment
 
