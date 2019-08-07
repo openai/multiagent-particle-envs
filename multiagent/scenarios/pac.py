@@ -9,12 +9,12 @@ class Scenario(BaseScenario):
         # set any world properties first
         world.dim_c = 4
         #world.damping = 1
-        num_good_agents = 2
+        num_good_agents = 1
         num_adversaries = 4
         num_agents = num_adversaries + num_good_agents
         num_landmarks = 1
-        num_food = 2
-        num_forests = 2
+        num_food = 1
+        # num_forests = 2
         # add agents
         world.agents = [Agent() for i in range(num_agents)]
         for i, agent in enumerate(world.agents):
@@ -33,7 +33,7 @@ class Scenario(BaseScenario):
             landmark.name = 'landmark %d' % i
             landmark.collide = True
             landmark.movable = False
-            landmark.size = 0.2
+            landmark.size = 0.05
             landmark.boundary = False
         world.food = [Landmark() for i in range(num_food)]
         for i, landmark in enumerate(world.food):
@@ -42,15 +42,15 @@ class Scenario(BaseScenario):
             landmark.movable = False
             landmark.size = 0.03
             landmark.boundary = False
-        world.forests = [Landmark() for i in range(num_forests)]
-        for i, landmark in enumerate(world.forests):
-            landmark.name = 'forest %d' % i
-            landmark.collide = False
-            landmark.movable = False
-            landmark.size = 0.3
-            landmark.boundary = False
+        # world.forests = [Landmark() for i in range(num_forests)]
+        # for i, landmark in enumerate(world.forests):
+        #     landmark.name = 'forest %d' % i
+        #     landmark.collide = False
+        #     landmark.movable = False
+        #     landmark.size = 0.3
+        #     landmark.boundary = False
         world.landmarks += world.food
-        world.landmarks += world.forests
+        # world.landmarks += world.forests
         #world.landmarks += self.set_boundaries(world)  # world boundaries now penalized with negative reward
         # make initial conditions
         self.reset_world(world)
@@ -97,13 +97,13 @@ class Scenario(BaseScenario):
             if i > 3: agent.color = np.array([0.9, 0.9, 0.0])
         # color properties for landmarks
         for i, landmark in enumerate(world.landmarks):
-            landmark.color = np.array([0.25, 0.25, 0.25])
+            landmark.color = np.array([0.0, 0.0, 0.8])
         for i, landmark in enumerate(world.food):
-            landmark.color = np.array([0.15, 0.15, 0.65])
-        for i, landmark in enumerate(world.forests):
-            landmark.color = np.array([0.6, 0.9, 0.6])
-        # set random initial states
-        for agent in world.agents:
+            landmark.color = np.array([0.8, 0.8, 0.8])
+        # for i, landmark in enumerate(world.forests):
+        #     landmark.color = np.array([0.6, 0.9, 0.6])
+        # set initial positions
+        for i, agent in enumerate(world.agents):
             agent.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
             agent.state.p_vel = np.zeros(world.dim_p)
             agent.state.c = np.zeros(world.dim_c)
@@ -113,9 +113,9 @@ class Scenario(BaseScenario):
         for i, landmark in enumerate(world.food):
             landmark.state.p_pos = np.random.uniform(-0.9, +0.9, world.dim_p)
             landmark.state.p_vel = np.zeros(world.dim_p)
-        for i, landmark in enumerate(world.forests):
-            landmark.state.p_pos = np.random.uniform(-0.9, +0.9, world.dim_p)
-            landmark.state.p_vel = np.zeros(world.dim_p)
+        # for i, landmark in enumerate(world.forests):
+        #     landmark.state.p_pos = np.random.uniform(-0.9, +0.9, world.dim_p)
+        #     landmark.state.p_vel = np.zeros(world.dim_p)
 
     def benchmark_data(self, agent, world):
         if agent.adversary:
@@ -158,17 +158,19 @@ class Scenario(BaseScenario):
 
 
     def agent_reward(self, agent, world):
-        # Agents are rewarded based on minimum agent distance to each landmark
+        # Pacmen are rewarded based on minimum agent distance to each ghost
         rew = 0
         shape = False
         adversaries = self.adversaries(world)
         if shape:
             for adv in adversaries:
                 rew += 0.1 * np.sqrt(np.sum(np.square(agent.state.p_pos - adv.state.p_pos)))
+        # Penalize pacmen for colliding with ghosts
         if agent.collide:
             for a in adversaries:
                 if self.is_collision(a, agent):
                     rew -= 5
+        # Out of bounds penalty
         def bound(x):
             if x < 0.9:
                 return 0
@@ -180,15 +182,18 @@ class Scenario(BaseScenario):
             x = abs(agent.state.p_pos[p])
             rew -= 2 * bound(x)
 
+        # Reward for colliding with food
         for food in world.food:
             if self.is_collision(agent, food):
                 rew += 2
+                food.color = None
+                world.food.remove(food)
         rew += 0.05 * min([np.sqrt(np.sum(np.square(food.state.p_pos - agent.state.p_pos))) for food in world.food])
 
         return rew
 
     def adversary_reward(self, agent, world):
-        # Agents are rewarded based on minimum agent distance to each landmark
+        # Ghosts are rewarded based on minimum agent distance to each pacman
         rew = 0
         shape = True
         agents = self.good_agents(world)
@@ -233,15 +238,15 @@ class Scenario(BaseScenario):
             if not entity.boundary:
                 entity_pos.append(entity.state.p_pos - agent.state.p_pos)
 
-        in_forest = [np.array([-1]), np.array([-1])]
-        inf1 = False
-        inf2 = False
-        if self.is_collision(agent, world.forests[0]):
-            in_forest[0] = np.array([1])
-            inf1= True
-        if self.is_collision(agent, world.forests[1]):
-            in_forest[1] = np.array([1])
-            inf2 = True
+        # in_forest = [np.array([-1]), np.array([-1])]
+        # inf1 = False
+        # inf2 = False
+        # if self.is_collision(agent, world.forests[0]):
+        #     in_forest[0] = np.array([1])
+        #     inf1= True
+        # if self.is_collision(agent, world.forests[1]):
+        #     in_forest[1] = np.array([1])
+        #     inf2 = True
 
         food_pos = []
         for entity in world.food:
@@ -254,9 +259,10 @@ class Scenario(BaseScenario):
         for other in world.agents:
             if other is agent: continue
             comm.append(other.state.c)
-            oth_f1 = self.is_collision(other, world.forests[0])
-            oth_f2 = self.is_collision(other, world.forests[1])
-            if (inf1 and oth_f1) or (inf2 and oth_f2) or (not inf1 and not oth_f1 and not inf2 and not oth_f2) or agent.leader:  #without forest vis
+            # oth_f1 = self.is_collision(other, world.forests[0])
+            # oth_f2 = self.is_collision(other, world.forests[1])
+            # if (inf1 and oth_f1) or (inf2 and oth_f2) or (not inf1 and not oth_f1 and not inf2 and not oth_f2) or agent.leader:  #without forest vis
+            if agent.leader:
                 other_pos.append(other.state.p_pos - agent.state.p_pos)
                 if not other.adversary:
                     other_vel.append(other.state.p_vel)
@@ -266,29 +272,32 @@ class Scenario(BaseScenario):
                     other_vel.append([0, 0])
 
         # to tell the pred when the prey are in the forest
-        prey_forest = []
-        ga = self.good_agents(world)
-        for a in ga:
-            if any([self.is_collision(a, f) for f in world.forests]):
-                prey_forest.append(np.array([1]))
-            else:
-                prey_forest.append(np.array([-1]))
+        # prey_forest = []
+        # ga = self.good_agents(world)
+        # for a in ga:
+        #     if any([self.is_collision(a, f) for f in world.forests]):
+        #         prey_forest.append(np.array([1]))
+        #     else:
+        #         prey_forest.append(np.array([-1]))
         # to tell leader when pred are in forest
-        prey_forest_lead = []
-        for f in world.forests:
-            if any([self.is_collision(a, f) for a in ga]):
-                prey_forest_lead.append(np.array([1]))
-            else:
-                prey_forest_lead.append(np.array([-1]))
+        # prey_forest_lead = []
+        # for f in world.forests:
+        #     if any([self.is_collision(a, f) for a in ga]):
+        #         prey_forest_lead.append(np.array([1]))
+        #     else:
+        #         prey_forest_lead.append(np.array([-1]))
 
         comm = [world.agents[0].state.c]
 
         if agent.adversary and not agent.leader:
-            return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos + other_vel + in_forest + comm)
+            # return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos + other_vel + in_forest + comm)
+            return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos + other_vel + comm)
         if agent.leader:
             return np.concatenate(
-                [agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos + other_vel + in_forest + comm)
+                # [agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos + other_vel + in_forest + comm)
+                [agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos + other_vel  + comm)
         else:
-            return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos + in_forest + other_vel)
+            # return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos + in_forest + other_vel)
+            return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos + other_vel)
 
 
