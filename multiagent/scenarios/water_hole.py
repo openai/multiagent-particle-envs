@@ -8,8 +8,8 @@ class Scenario(BaseScenario):
         world = World()
         # set any world properties first
         world.dim_c = 2
-        num_agents = 3
-        num_landmarks = 3
+        num_agents = 6
+        num_landmarks = 5
         world.collaborative = True
         # add agents
         world.agents = [Agent() for i in range(num_agents)]
@@ -42,7 +42,7 @@ class Scenario(BaseScenario):
             agent.state.c = np.zeros(world.dim_c)
         for i, landmark in enumerate(world.landmarks):
             landmark.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
-            landmark.size = np.random.uniform(0, +0.5)
+            landmark.size = np.random.uniform(0, +0.1)
             landmark.state.p_vel = np.zeros(world.dim_p)
 
     def benchmark_data(self, agent, world):
@@ -79,11 +79,12 @@ class Scenario(BaseScenario):
 	        	for a in world.agents:
 	        		if self.is_collision(a,l):
 	        			numFeeders += 1;
-	        	rew += l.size / numFeeders
+	        	rew += l.size / numFeeders * 10
         if agent.collide:
             for a in world.agents:
-                if self.is_collision(a, agent):
-                    rew -= 10
+                if a is not agent:
+                    if self.is_collision(a, agent):
+                        rew -= 5
         return rew
 
     def observation(self, agent, world):
