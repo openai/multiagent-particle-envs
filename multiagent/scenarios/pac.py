@@ -183,12 +183,14 @@ class Scenario(BaseScenario):
             rew -= 2 * bound(x)
 
         # Reward for colliding with food
-        for food in world.food:
+        for i, food in enumerate(world.food):
             if self.is_collision(agent, food):
                 rew += 2
                 food.color = None
+                food.name = 'collected food %d' % i
                 world.food.remove(food)
-        rew += 0.05 * min([np.sqrt(np.sum(np.square(food.state.p_pos - agent.state.p_pos))) for food in world.food])
+        if len(world.food) > 0:
+            rew += 0.05 * min([np.sqrt(np.sum(np.square(food.state.p_pos - agent.state.p_pos))) for food in world.food])
 
         return rew
 
