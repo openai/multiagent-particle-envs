@@ -7,26 +7,28 @@ backWardPunishment = 5
 
 class Scenario(BaseScenario):
     def __init__(self):
-    	super(Scenario, self).__init__()
-    	self.agentsToLandMarks = {}
+        super(Scenario, self).__init__()
+        self.agentsToLandMarks = {}
+        self.numberOfAgents=6
 
     def make_world(self):
         world = World()
         # add agents
-        numberOfAgents = 2;
-        world.agents = [Agent() for i in range(numberOfAgents)]
+
+        world.agents = [Agent() for i in range(self.numberOfAgents)]
         for i, agent in enumerate(world.agents):
+            print(i)
             agent.name = 'agent %d' % i
             agent.collide = False
             agent.silent = True
         # add landmarks
-        world.landmarks = [Landmark() for i in range(numberOfAgents)]
+        world.landmarks = [Landmark() for i in range(self.numberOfAgents)]
         for i, landmark in enumerate(world.landmarks):
             landmark.name = 'landmark %d' % i
             landmark.collide = False
             landmark.movable = False
         #fill in the dictionary
-        for i in range(numberOfAgents):
+        for i in range(self.numberOfAgents):
         	self.agentsToLandMarks.update({ world.agents[i]: world.landmarks[i] })
 
         # make initial conditions
@@ -44,12 +46,12 @@ class Scenario(BaseScenario):
         # set random initial states
         for i,agent in enumerate(world.agents):
             # agent.state.p_pos = np.random.uniform(-1,+1, world.dim_p)
-            agent.state.p_pos = np.array([i/2,0])
+            agent.state.p_pos = np.array([i/self.numberOfAgents,0])
             agent.state.p_vel = np.zeros(world.dim_p)
             agent.state.c = np.zeros(world.dim_c)
         for i, landmark in enumerate(world.landmarks):
             # landmark.state.p_pos = np.random.uniform(-1,+1, world.dim_p)
-            landmark.state.p_pos = np.array([i/2,0.75])
+            landmark.state.p_pos = np.array([i/self.numberOfAgents,0])
             landmark.state.p_vel = np.zeros(world.dim_p)
 
 
