@@ -12,8 +12,8 @@ class Scenario(BaseScenario):
         num_good_agents = 1
         num_adversaries = 4
         num_agents = num_adversaries + num_good_agents
-        num_landmarks = 1
-        num_food = 1
+        num_landmarks = 2
+        num_food = 10
         # num_forests = 2
         # add agents
         world.agents = [Agent() for i in range(num_agents)]
@@ -33,7 +33,7 @@ class Scenario(BaseScenario):
             landmark.name = 'landmark %d' % i
             landmark.collide = True
             landmark.movable = False
-            landmark.size = 0.05
+            landmark.size = 0.2
             landmark.boundary = False
         world.food = [Landmark() for i in range(num_food)]
         for i, landmark in enumerate(world.food):
@@ -158,18 +158,18 @@ class Scenario(BaseScenario):
 
 
     def agent_reward(self, agent, world):
-        # Pacmen are rewarded based on minimum agent distance to each ghost
+        # Agents are rewarded based on minimum agent distance to each adversary
         rew = 0
         shape = False
         adversaries = self.adversaries(world)
         if shape:
             for adv in adversaries:
                 rew += 0.1 * np.sqrt(np.sum(np.square(agent.state.p_pos - adv.state.p_pos)))
-        # Penalize pacmen for colliding with ghosts
-        if agent.collide:
-            for a in adversaries:
-                if self.is_collision(a, agent):
-                    rew -= 5
+        # Penalize agents for colliding with adversaries
+        for a in adversaries:
+            if self.is_collision(a, agent):
+                rew -= 5
+                print('collided with adversary')
         # Out of bounds penalty
         def bound(x):
             if x < 0.9:
@@ -183,12 +183,14 @@ class Scenario(BaseScenario):
             rew -= 2 * bound(x)
 
         # Reward for colliding with food
-        for i, food in enumerate(world.food):
+        # for i, food in enumerate(world.food):
+        for food in world.food:
             if self.is_collision(agent, food):
                 rew += 2
-                food.color = None
-                food.name = 'collected food %d' % i
+                food.color = np.array([0.0, 0.0, 0.0])
+                #food.name = '(collected) food %d' % i
                 world.food.remove(food)
+        # Reward for being in proximity to food
         if len(world.food) > 0:
             rew += 0.05 * min([np.sqrt(np.sum(np.square(food.state.p_pos - agent.state.p_pos))) for food in world.food])
 
