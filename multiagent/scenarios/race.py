@@ -88,12 +88,12 @@ class Scenario(BaseScenario):
 
         for i, thisAgent in enumerate(world.agents):
             if numOfCheaters > numOfAgents//2:
-                thisAgent.action.u[1] = -0.1 # all cheat: move back ward
+                thisAgent.action.u[1] = -1.0 # all cheat: move back ward
             elif numOfCheaters == 0:
-                thisAgent.action.u[1] = 0.1 # all cooperate: move up together
+                thisAgent.action.u[1] = 1.0 # all cooperate: move up together
             else:
                 if thisAgent.action.u[1] > 0.0: # this agent cheat
-                    thisAgent.action.u[1] += 0.2
+                    thisAgent.action.u[1] += 2.0
                 else:
                     thisAgent.action.u[1] = 0.0
             reward_n.append(thisAgent.action.u[1])
