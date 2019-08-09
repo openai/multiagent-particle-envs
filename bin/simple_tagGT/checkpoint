@@ -1,0 +1,2 @@
+model_checkpoint_path: "model-prey-coop"
+all_model_checkpoint_paths: "model-prey-coop"

@@ -1,0 +1,7 @@
+To train:
+=========
+python train.py --scenario simple_tagGT --save-dir "./simple_tagGT/model"
+
+To display:
+===========
+python train.py --scenario simple_tagGT --display --load-dir "./simple_tagGT/model"
