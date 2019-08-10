@@ -230,7 +230,7 @@ class MultiAgentEnv(gym.Env):
             for entity in self.world.entities:
                 geom = rendering.make_circle(entity.size)
                 xform = rendering.Transform()
-                if 'agent' in entity.name:
+                if 'agent' in entity.name or 'waterhole' in entity.name:
                     color = (entity.color[0], entity.color[1], entity.color[2], 0.5)
                     geom.set_color(*color)
                 else:

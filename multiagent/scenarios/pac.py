@@ -186,7 +186,7 @@ class Scenario(BaseScenario):
         # for i, food in enumerate(world.food):
         for food in world.food:
             if self.is_collision(agent, food):
-                rew += 2
+                rew += 10
                 food.color = np.array([0.0, 0.0, 0.0])
                 #food.name = '(collected) food %d' % i
                 world.food.remove(food)

@@ -17,11 +17,11 @@ class Scenario(BaseScenario):
             agent.name = 'agent %d' % i
             agent.collide = True
             agent.silent = True
-            agent.size = 0.15
+            agent.size = 0.05
         # add landmarks
         world.landmarks = [Landmark() for i in range(num_landmarks)]
         for i, landmark in enumerate(world.landmarks):
-            landmark.name = 'landmark %d' % i
+            landmark.name = 'landmark waterhole %d' % i
             landmark.collide = False
             landmark.movable = False
         # make initial conditions
@@ -42,7 +42,7 @@ class Scenario(BaseScenario):
             agent.state.c = np.zeros(world.dim_c)
         for i, landmark in enumerate(world.landmarks):
             landmark.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
-            landmark.size = np.random.uniform(0.05, +0.3)
+            landmark.size = np.random.uniform(0.08, +0.3)
             landmark.state.p_vel = np.zeros(world.dim_p)
 
     def benchmark_data(self, agent, world):
