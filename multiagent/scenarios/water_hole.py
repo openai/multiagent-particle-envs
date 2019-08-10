@@ -31,10 +31,10 @@ class Scenario(BaseScenario):
     def reset_world(self, world):
         # random properties for agents
         for i, agent in enumerate(world.agents):
-            agent.color = np.array([0.35, 0.35, 0.85])
+            agent.color = np.array([0.25, 0.25, 0.25])
         # random properties for landmarks
         for i, landmark in enumerate(world.landmarks):
-            landmark.color = np.array([0.25, 0.25, 0.25])
+            landmark.color = np.array([0.35, 0.35, 0.85])
         # set random initial states
         for agent in world.agents:
             agent.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
@@ -42,7 +42,7 @@ class Scenario(BaseScenario):
             agent.state.c = np.zeros(world.dim_c)
         for i, landmark in enumerate(world.landmarks):
             landmark.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
-            landmark.size = np.random.uniform(0, +0.1)
+            landmark.size = np.random.uniform(0.05, +0.3)
             landmark.state.p_vel = np.zeros(world.dim_p)
 
     def benchmark_data(self, agent, world):
@@ -80,11 +80,11 @@ class Scenario(BaseScenario):
 	        		if self.is_collision(a,l):
 	        			numFeeders += 1;
 	        	rew += l.size / numFeeders * 10
-        if agent.collide:
-            for a in world.agents:
-                if a is not agent:
-                    if self.is_collision(a, agent):
-                        rew -= 5
+        # if agent.collide:
+        #     for a in world.agents:
+        #         if a is not agent:
+        #             if self.is_collision(a, agent):
+        #                 rew -= 5
         return rew
 
     def observation(self, agent, world):
