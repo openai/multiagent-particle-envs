@@ -1,0 +1,3 @@
+model_checkpoint_path: "/tmp/policy_best/"
+all_model_checkpoint_paths: "/tmp/policy/"
+all_model_checkpoint_paths: "/tmp/policy_best/"
