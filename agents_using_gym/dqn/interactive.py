@@ -8,7 +8,7 @@ import multiagent.scenarios as scenarios
 import numpy as np
 import keras.backend.tensorflow_backend as backend
 from keras.models import Sequential
-from keras.layers import Dense, Dropout, Conv1D, MaxPooling1D, Activation, Flatten
+from keras.layers import Dense, Dropout, Conv2D, MaxPooling2D, Activation, Flatten
 from keras.optimizers import Adam
 from keras.callbacks import TensorBoard
 import tensorflow as tf
@@ -48,7 +48,7 @@ if __name__ == '__main__':
     MEMORY_FRACTION = 0.20
     
     # Environment settings
-    EPISODES = 20
+    EPISODES = 200
     
     # Exploration settings
     epsilon = 1  # not a constant, going to be decayed
@@ -132,22 +132,20 @@ if __name__ == '__main__':
     
         def create_model(self):
             model = Sequential()
-            #len(obs_n[0])
-    
-            model.add(Conv1D(256, (3), input_shape=(64,4)))  # OBSERVATION_SPACE_VALUES = (10, 10, 3) a 10x10 RGB image.
+            model.add(Conv2D(256, (3, 3), input_shape=(10, 10, 3)))  # OBSERVATION_SPACE_VALUES = (10, 10, 3) a 10x10 RGB image.
             model.add(Activation('relu'))
-            model.add(MaxPooling1D(pool_size=(2)))
+            model.add(MaxPooling2D(pool_size=(2, 2)))
             model.add(Dropout(0.2))
     
-            model.add(Conv1D(256, (3)))
+            model.add(Conv2D(256, (3, 3)))
             model.add(Activation('relu'))
-            model.add(MaxPooling1D(pool_size=(2)))
+            model.add(MaxPooling2D(pool_size=(2, 2)))
             model.add(Dropout(0.2))
     
-            #model.add(Flatten())  # this converts our 3D feature maps to 1D feature vectors
+            model.add(Flatten())  # this converts our 3D feature maps to 1D feature vectors
             model.add(Dense(64))
     
-            model.add(Dense(5, activation='linear'))  # ACTION_SPACE_SIZE = how many choices (5)
+            model.add(Dense(5, activation='linear'))  # ACTION_SPACE_SIZE = how many choices (9)
             model.compile(loss="mse", optimizer=Adam(lr=0.001), metrics=['accuracy'])
             return model
     
@@ -213,10 +211,43 @@ if __name__ == '__main__':
         def get_qs(self, state):
             return self.model.predict(np.array(state).reshape(-1, *state.shape)/255)[0]
     
+        
     
-    
-    
-    
+    d = {1: (100, 0, 0),
+         2: (0, 100, 0),
+         3: (0, 0, 100),
+         4: (25,25,25)}
+    def getobs(obsn):
+        env = np.zeros((10, 10, 3), dtype=np.uint8)  # starts an rbg of our size
+        obs=obsn.copy()
+        for i in obs:
+            i=int((i+1)/0.2)
+        env[int(obs[0])][int(obs[1])][0]+=100  # sets the food location tile to green color
+        env[int(obs[2])][int(obs[3])][1]+=100 
+        img = Image.fromarray(env, 'RGB')  # reading to rgb. Apparently. Even tho color definitions are bgr. ???
+        img=np.array(img)
+        return img        
+    def getobsi(obsn):
+        env = np.zeros((10, 10, 3), dtype=np.uint8)  # starts an rbg of our size
+        obs=obsn.copy()
+        for i in obs:
+            i=int((i+1)/0.2)
+        env[int(obs[2])][int(obs[3])][0]+=100  # sets the food location tile to green color
+        env[int(obs[4])][int(obs[5])][1]+=100   # sets the enemy location to red
+        env[int(obs[6])][int(obs[7])][2] +=100  # sets the player tile to blue
+        env[int(obs[8])][int(obs[9])][0] +=25
+        env[int(obs[8])][int(obs[9])][1] +=25
+        env[int(obs[8])][int(obs[9])][2] +=25
+        env[int(obs[10])][int(obs[11])][0] +=25
+        env[int(obs[10])][int(obs[11])][1] +=25
+        env[int(obs[10])][int(obs[11])][2] +=25
+        env[int(obs[12])][int(obs[13])][0] +=25
+        env[int(obs[12])][int(obs[13])][1] +=25
+        env[int(obs[12])][int(obs[13])][2] +=25        
+        
+        img = Image.fromarray(env, 'RGB')  # reading to rgb. Apparently. Even tho color definitions are bgr. ???
+        img=np.array(img)
+        return img
     
     
     
@@ -246,7 +277,7 @@ if __name__ == '__main__':
                 act = np.zeros(5)
                 if np.random.random() > epsilon:
                     # Get action from Q table
-                    action = np.argmax(policy.get_qs(obs_n[i]))
+                    action = np.argmax(policy.get_qs(getobs(obs_n[i])))
                 else:
                     # Get random action
                     action = np.random.randint(0, 5)                
@@ -258,7 +289,7 @@ if __name__ == '__main__':
             done=done_n[0]
             for i, policy in enumerate(policies):
                 episode_reward[i]+=reward_n[i]
-                policy.update_replay_memory((obs_n[i], action_n[i], reward_n[i], newobs_n[i], done_n[i]))
+                policy.update_replay_memory((getobs(obs_n[i]), action_n[i], reward_n[i], getobs(newobs_n[i]), done_n[i]))
                 policy.train(done_n[i], step)                
             
             obs_n=newobs_n
