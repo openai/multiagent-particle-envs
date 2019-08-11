@@ -1,0 +1,6 @@
+1th : 0.8 cheater
+4th: "copy"
+5-6th: cheater
+2-3th,7-8th: cooperator
+
+however, the copy change the overall performance if the environment changes(mroe cooperator)
