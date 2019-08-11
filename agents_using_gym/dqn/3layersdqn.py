@@ -134,7 +134,7 @@ if __name__ == '__main__':
             model = Sequential()
             model.add(Dense(len(obs_n[0])))
             #model.add(Conv2D(256, (3, 3), input_shape=(10, 10, 3)))  # OBSERVATION_SPACE_VALUES = (10, 10, 3) a 10x10 RGB image.
-            model.add(Activation('linear'))
+            model.add(Activation('relu'))
             #model.add(MaxPooling2D(pool_size=(2, 2)))
             
             #model.add(Dropout(0.2))
@@ -145,7 +145,7 @@ if __name__ == '__main__':
             #model.add(Dropout(0.2))
     
            # model.add(Flatten())  # this converts our 3D feature maps to 1D feature vectors
-            model.add(Dense(32,activation='linear'))
+            model.add(Dense(32,activation='relu'))
     
             model.add(Dense(5, activation='linear'))  # ACTION_SPACE_SIZE = how many choices (9)
             model.compile(loss="mse", optimizer=Adam(lr=0.001), metrics=['accuracy'])
