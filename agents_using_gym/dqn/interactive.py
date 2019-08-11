@@ -17,7 +17,7 @@ import time
 import random
 from tqdm import tqdm
 from PIL import Image
-import cv2
+
 
 
 if __name__ == '__main__':
@@ -112,8 +112,8 @@ if __name__ == '__main__':
     
     # Agent class
     class DQNAgent:
-        def __init__(self):
-    
+        def __init__(self,i):
+            self.index=i
             # Main model
             self.model = self.create_model()
     
@@ -125,7 +125,7 @@ if __name__ == '__main__':
             self.replay_memory = deque(maxlen=REPLAY_MEMORY_SIZE)
     
             # Custom tensorboard object
-            self.tensorboard = ModifiedTensorBoard(log_dir="logs/{}-{}".format(MODEL_NAME, int(time.time())))
+            self.tensorboard = ModifiedTensorBoard(log_dir="logs/{}-{}-{}".format(MODEL_NAME, self.index,int(time.time())))
     
             # Used to count when to update target network with main network's weights
             self.target_update_counter = 0
@@ -259,7 +259,7 @@ if __name__ == '__main__':
     
     
     # create interactive policies for each agent
-    policies = [DQNAgent() for i in range(env.n)]
+    policies = [DQNAgent(i) for i in range(env.n)]
     
     for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
         episode_reward=[0,0,0]
@@ -286,15 +286,17 @@ if __name__ == '__main__':
                 act_n.append(act)
                 # step environment
             newobs_n, reward_n, done_n, _ = env.step(act_n)
-            done=done_n[0]
+            if step>=100:
+                done=True
             for i, policy in enumerate(policies):
                 episode_reward[i]+=reward_n[i]
-                policy.update_replay_memory((getobs(obs_n[i]), action_n[i], reward_n[i], getobs(newobs_n[i]), done_n[i]))
-                policy.train(done_n[i], step)                
-            
-            obs_n=newobs_n
+                policy.update_replay_memory((getobs(obs_n[i]), action_n[i], reward_n[i], getobs(newobs_n[i]), done))
+                policy.train(done, step)                
+                
+                obs_n=newobs_n
             step+=1
-            if SHOW_PREVIEW and not episode % AGGREGATE_STATS_EVERY:
+            #if SHOW_PREVIEW and not episode % AGGREGATE_STATS_EVERY:
+            if episode % 50==1:
                 env.render()
         for i, policy in enumerate(policies):
             ep_rewards[i].append(episode_reward[i])
@@ -306,7 +308,7 @@ if __name__ == '__main__':
         
                 # Save model, but only when min reward is greater or equal a set value
                 if min_reward >= MIN_REWARD:
-                    agent.model.save(f'models/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')            
+                    policy.model.save(f'models/{MODEL_NAME+str(policy.index)}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')            
 
         if epsilon > MIN_EPSILON:
             epsilon *= EPSILON_DECAY
