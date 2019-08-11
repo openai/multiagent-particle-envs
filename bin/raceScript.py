@@ -5,6 +5,7 @@ import argparse
 
 from multiagent.envRace import MultiAgentRaceEnv
 from multiagent.policy import InteractivePolicy
+from multiagent.policyRace import InteractivePolicy_race
 import multiagent.scenarios as scenarios
 
 if __name__ == '__main__':
@@ -22,16 +23,28 @@ if __name__ == '__main__':
     # render call to create viewer window (necessary only for interactive policies)
     env.render()
     # create interactive policies for each agent
-    policies = [InteractivePolicy(env,i) for i in range(env.n)]
+    policies = [InteractivePolicy_race(env,i) for i in range(env.n)]
     # execution loop
     obs_n = env.reset()
+    #single cheat)
+            #print(thisAgent.action.u[1])
     while True:
+    #for i in range(100):
         # query for action from each agent's policy
-        act_n = []
+        
+        #for i, thisAgent in enumerate(world.agents):
+            #if(i==0):
+                #thisAgent.action.u[1]=1
+                #print(thisAgent.action.u[1])               
+        act_n = [] 
         for i, policy in enumerate(policies):
             act_n.append(policy.action(obs_n[i]))
+            #print(policy.action(obs_n[i]))
         # step environment
         obs_n, reward_n, done_n, _ = env.step(act_n)
+        #for i, thisAgent in enumerate(world.agents):
+            #if(i==0):
+                #print(thisAgent.action.u)        
         # render all agent views
         env.render()
         # display rewards

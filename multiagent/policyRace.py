@@ -1,3 +1,10 @@
+import numpy as np
+import random
+from datetime import datetime
+from pyglet.window import key
+from multiagent.scenarios.simple import Scenario
+
+
 # individual agent policy
 class Policy(object):
     def __init__(self):
@@ -7,9 +14,9 @@ class Policy(object):
 
 # interactive policy based on keyboard input
 # hard-coded to deal only with movement, not communication
-class InteractivePolicy(Policy):
+class InteractivePolicy_race(Policy):
     def __init__(self, env, agent_index):
-        super(InteractivePolicy, self).__init__()
+        super(InteractivePolicy_race, self).__init__()
         self.env = env
         #self.agent_index = agent_index
         # hard-coded keyboard events
@@ -20,6 +27,7 @@ class InteractivePolicy(Policy):
         env.viewers[agent_index].window.on_key_release = self.key_release
 
     def action(self, obs):
+        random.seed( datetime.now())
         # ignore observation and just act based on keyboard events
         if self.env.discrete_action_input:
             u = 0
@@ -34,7 +42,10 @@ class InteractivePolicy(Policy):
             if self.move[3]: u[3] += 1.0
             if self.move[2]: u[4] += 1.0
             if True not in self.move:
-                u[0] += 1.0
+                i=random.randint(1,10)
+                #u[1] += 1.0
+                #if(i>5):
+                    #u[0] += 1.0
         return np.concatenate([u, np.zeros(self.env.world.dim_c)])
 
     # keyboard event callbacks
