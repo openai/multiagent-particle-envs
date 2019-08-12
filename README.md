@@ -1,4 +1,4 @@
-**Status:** Code in active development for a class project at the Rensselaer Polytechnic Institute
+**Status:** Code is an archived project for the Rensselaer Polytechnic Institute's Open Source Software Class.
 
 - Most team communication done via mattermost at chat.rcos.io
 - The working directory is in development branch
