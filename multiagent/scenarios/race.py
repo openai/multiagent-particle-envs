@@ -1,6 +1,4 @@
 import numpy as np
-import random
-from datetime import datetime
 from multiagent.coreRace import World, Agent, Landmark
 from multiagent.scenario import BaseScenario
 
@@ -11,15 +9,19 @@ class Scenario(BaseScenario):
     def __init__(self):
         super(Scenario, self).__init__()
         self.agentsToLandMarks = {}
-        self.numberOfAgents=8
-        self.laststate=0
+        self.numberOfAgents=6
+        self.allCooperateForce = 1.0
+        self.allCheatPunishment = -1.0
+        self.cheaterGain = 2.0
+        self.robbedCooperator = 0.0
+
     def make_world(self):
         world = World()
         # add agents
 
         world.agents = [Agent() for i in range(self.numberOfAgents)]
         for i, agent in enumerate(world.agents):
-            #print(i)
+            print(i)
             agent.name = 'agent %d' % i
             agent.collide = False
             agent.silent = True
@@ -31,7 +33,7 @@ class Scenario(BaseScenario):
             landmark.movable = False
         #fill in the dictionary
         for i in range(self.numberOfAgents):
-        	self.agentsToLandMarks.update({ world.agents[i]: world.landmarks[i] })
+            self.agentsToLandMarks.update({ world.agents[i]: world.landmarks[i] })
 
         # make initial conditions
         self.reset_world(world)
@@ -69,61 +71,39 @@ class Scenario(BaseScenario):
         cheat-cheat: all stay, all cooperate: all move as 1.0, cheat cooperate: cheater moves more.
         '''
 
-        random.seed( datetime.now())
+
         def agent_cheated(agent):
             if agent.action.u[1] > 0.0:
                 return True
             return False
-        
+
         reward_n = []
         numOfCheaters = 0
         numOfAgents = 0
-        # agent part code
+        # if(agent_cheated(world.agents[1])):
+        #     print(world.agents[1].action.u)
         for i, thisAgent in enumerate(world.agents):
-            j=random.randint(1,10)
-            if(i==0):
-                if(j>=8):
-                    thisAgent.action.u[1]=1
-            if(i==1):
-                if(j>=6):
-                    thisAgent.action.u[1]=1
-            if(i==2):
-                if(j>=4):
-                    thisAgent.action.u[1]=1
-            if(i==3):
-                thisAgent.action.u[1]=1
-            if(i==4):
-                thisAgent.action.u[1]=1
-            if(i==5):
-                thisAgent.action.u[1]=1                
-        #for i, thisAgent in enumerate(world.agents):
-            #print(thisAgent.action.u[1])
-        for i, thisAgent in enumerate(world.agents):
-            # if i == 0:
+            # if i == 2:
+            # print(thisAgent.action.u)
             # print(i)
             # print(agent.action.u)
             numOfAgents += 1
             thisAgent.action.u[0] = 0.0 #invalidate horizontal action
             if agent_cheated(thisAgent): #it's trying to move up
                 numOfCheaters += 1
-        #print(numOfCheaters)
+                # print("agent " + str(i) + "cheated" )
+        # print(numOfCheaters)
 
         for i, thisAgent in enumerate(world.agents):
             if numOfCheaters > numOfAgents//2:
-                
-                if thisAgent.action.u[1] == 1:
-                    thisAgent.action.u[1] = -0.01 # all cheat: move back ward
-                if thisAgent.action.u[1] == 0:
-                    thisAgent.action.u[1] = 0.01
-                #print("back")
+                thisAgent.action.u[1] = self.allCheatPunishment # all cheat: move back ward
             elif numOfCheaters == 0:
-                thisAgent.action.u[1] = 0.01 # all cooperate: move up together
+                thisAgent.action.u[1] = self.allCooperateForce # all cooperate: move up together
             else:
                 if thisAgent.action.u[1] > 0.0: # this agent cheat
-                    thisAgent.action.u[1] = 0.02
-                    #print("cheat")
+                    thisAgent.action.u[1] = self.cheaterGain
                 else:
-                    thisAgent.action.u[1] = 0.01
+                    thisAgent.action.u[1] = self.robbedCooperator
             reward_n.append(thisAgent.action.u[1])
         return reward_n
 
@@ -133,4 +113,3 @@ class Scenario(BaseScenario):
         for entity in world.landmarks:
             entity_pos.append(entity.state.p_pos - agent.state.p_pos)
         return np.concatenate([agent.state.p_vel] + entity_pos)
-
