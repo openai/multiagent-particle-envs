@@ -169,7 +169,6 @@ class Scenario(BaseScenario):
         for a in adversaries:
             if self.is_collision(a, agent):
                 rew -= 5
-                print('collided with adversary')
         # Out of bounds penalty
         def bound(x):
             if x < 0.9:
