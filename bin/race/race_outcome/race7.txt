@@ -1,0 +1,2 @@
+In this simulation, the first agent frome left always cooperate, the second agent
+from left always cheat, other 4 agents are trained agents. As a result, 2 agents became always-cheat agents, the other 2 trained agents became always-cooperate agents.

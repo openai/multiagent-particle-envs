@@ -1,0 +1,3 @@
+In this simulation, the agent on the right is a copy agent, the left one is a trained
+agent. This trained agent figured out that, to get maximum reward(force to move forward)
+ from each step, the best ways is to always cooperate.
