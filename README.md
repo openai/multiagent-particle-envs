@@ -11,7 +11,7 @@ Used in the paper [Multi-Agent Actor-Critic for Mixed Cooperative-Competitive En
 
   - If you're using [miniconda](https://docs.conda.io/en/latest/miniconda.html) (recommended) you can create an environment with `conda create --name multiagent-particle-envs python=3.5.4`
 
-  - This release requires `gym==0.10.5`, for newer versions of gym try using (jarbus's fork of this repo)[https://github.com/jarbus/multiagent-particle-envs/tree/pullreq] instead
+  - This release requires `gym==0.10.5`, for newer versions of gym try using [jarbus's fork of this repo](https://github.com/jarbus/multiagent-particle-envs/tree/pullreq) instead
 
 - To install, `cd` into the root directory and type `pip install -e .`
 
