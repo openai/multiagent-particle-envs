@@ -171,9 +171,6 @@ class MultiAgentEnv(gym.Env):
 
         for i in range(self.number_of_participants):
             player = DeterministicFunctionPerson(my_baseline_energy, points_multiplier = 10, response= self.response_type_string) #, )
-            ## TODO: Deterministic Function needs to be modified to set a flag on each agent to silent
-            ## TODO: add a prev_energy to keep track of their yesterday's energy
-
             player_dict['player_{}'.format(i)] = player
 
         return player_dict
@@ -275,28 +272,24 @@ def step(self, action_n):
     reward_n = []
     done_n = []
     info_n = {"n": []}
-
-    for i, agent in enumerate(self.agents):
-        agent.action = action_n[i]
     
     prev_price = self.prices[(self.day)]
-        self.day = (self.day + 1) % 365
-        self.curr_iter += 1
-        
-        if self.curr_iter > 0:
-            done = True
-            self.curr_iter = 0
-        else:
-            done = False
+    self.day = (self.day + 1) % 365
+    self.curr_iter += 1
+    
+    if self.curr_iter > 0:
+        done = True
+        self.curr_iter = 0
+    else:
+        done = False
 
-    for agent in self.agents:
-            obs_n.append(self._get_observation_per_agent(agent))
-            reward_n.append(self._get_reward_per_agent(agent))
-            done_n.append(self._get_done(agent))
+    for i, agent in enumerate(self.agents):
+        agent.prev_energy = self._simulate_human(action_n[i], agent)
+        obs_n.append(self._get_observation_per_agent(agent))
+        reward_n.append(self._get_reward_per_agent(agent))
+        done_n.append(done)
+        info_n["n"].append({}) ## this was left as a formality in the stableBaselines, too 
 
-            info_n["n"].append(self._get_info(agent))
-
-    reward = np.sum(reward_n)
     return obs_n, reward_n, done_n, info_n
 
 def _get_observation_per_agent(self, agent):
@@ -305,49 +298,41 @@ def _get_observation_per_agent(self, agent):
 
         if(self.yesterday_in_state):
             if self.energy_in_state:
-                return np.concatenate((next_observation, np.concatenate((prev_price, self.prev_energy))))
+                return np.concatenate((next_observation, np.concatenate((prev_price, agent.prev_energy))))
             else:
                 return np.concatenate((next_observation, prev_price))
 
         elif self.energy_in_state:
-            return np.concatenate((next_observation, self.prev_energy))
+            return np.concatenate((next_observation, agent.prev_energy))
 
         else:
             return next_observation
 
-def _get_reward_per_agent(self, agent, price, energy_consumptions, reward_function = "scaled_cost_distance"):
-        # TODO: finish massaging this 
+def _get_reward_per_agent(self, agent, reward_function = "scaled_cost_distance"):
         """
         Purpose: Compute reward given price signal and energy consumption of the office
 
         Args:
-            Price: Price signal vector (10-dim)
+            agent: DeterministicFunctionPerson object, simulated office twerker
             Energy_consumption: Dictionary containing energy usage by player in the office and the average office energy usage
         
         Returns: 
             Energy_consumption: Dictionary containing the energy usage by player and the average energy used in the office (key = "avg")
         """
 
-        total_reward = 0
-        for player_name in energy_consumptions:
-            if player_name != "avg":
-                # get the points output from players
-                player = self.player_dict[player_name]
+        price = self.prices[self.day]
+        # get the reward from the player's output
+        player_min_demand = agent.get_min_demand()
+        player_max_demand = agent.get_max_demand()
+        player_energy = agent.prev_energy
+        player_reward = Reward(player_energy, price, player_min_demand, player_max_demand)
 
-                # get the reward from the player's output
-                player_min_demand = player.get_min_demand()
-                player_max_demand = player.get_max_demand()
-                player_energy = energy_consumptions[player_name]
-                player_reward = Reward(player_energy, price, player_min_demand, player_max_demand)
+        if reward_function == "scaled_cost_distance":
+            player_ideal_demands = player_reward.ideal_use_calculation()
+            reward = player_reward.scaled_cost_distance(player_ideal_demands)
 
-                if reward_function == "scaled_cost_distance":
-                    player_ideal_demands = player_reward.ideal_use_calculation()
-                    reward = player_reward.scaled_cost_distance(player_ideal_demands)
-
-                elif reward_function == "log_cost_regularized":
-                    reward = player_reward.log_cost_regularized()
-
-                total_reward += reward
+        elif reward_function == "log_cost_regularized":
+            reward = player_reward.log_cost_regularized()
 
         return total_reward
     
