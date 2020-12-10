@@ -9,9 +9,10 @@ import random
 
 import tensorflow as tf
 
-from gym_socialgame.envs.utils import price_signal, fourier_points_from_action
-from gym_socialgame.envs.agents import *
-from gym_socialgame.envs.reward import Reward
+# manan these are in the same directory -- you may need to add that to the path, but prob not 
+from utils import price_signal, fourier_points_from_action
+from agents import *
+from reward import Reward
 
 import pickle
 
