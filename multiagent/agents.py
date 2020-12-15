@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
-import random
 
 #### file to make the simulation of people that we can work with
 
@@ -214,19 +213,9 @@ class DeterministicFunctionPerson(Person):
         elif self.response == "l":
             energy_resp = self.linear_response(points, day_of_week=day_of_week)
         elif self.response == "m":
-            draw = random.randint(Start=0, Stop=2)
-            if draw == 0:
-                energy_resp = self.threshold_exp_response(
-                    points, day_of_week=day_of_week
-                )
-            elif draw == 1:
-                energy_resp = self.sin_response(points, day_of_week=day_of_week)
-            else:
-                energy_resp = self.linear_response(points, day_of_week=day_of_week)
             energy_resp = self.mixed_response(points, day_of_week=day_of_week)
         else:
             raise NotImplementedError
-
         return energy_resp
 
 

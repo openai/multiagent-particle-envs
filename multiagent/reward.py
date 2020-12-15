@@ -65,7 +65,7 @@ class Reward:
         for i in range(self._num_timesteps):
             constraints += [demands[i] <= max_demand]
             constraints += [min_demand <= demands[i]]
-            # if i != 0:
+            # if i != 0:y
             # 	constraints += [cvx.abs(demands[i] - demands[i-1]) <= 100]
 
         objective = cvx.Minimize(demands.T * prices)
