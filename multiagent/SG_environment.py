@@ -307,6 +307,19 @@ class MultiAgentEnv(gym.Env):
         return player_energy
 
     def step(self, action_n):
+        for i, action in enumerate(action_n):
+            action = np.asarray(action)
+            if self.action_space_string == "continuous":
+                action = np.clip(action, 0, 10)
+                action_n[i] = action
+            else:
+                raise Exception("Wrong action_space_string")
+
+        print("--" * 10)
+        print("--" * 10)
+        print("clipped action")
+        print(action_n)
+
         obs_n = []
         reward_n = []
         done_n = []
@@ -316,7 +329,7 @@ class MultiAgentEnv(gym.Env):
         self.day = (self.day + 1) % 365
         self.curr_iter += 1
 
-        if self.curr_iter > 0:
+        if self.curr_iter > 0:  ### could change
             done = True
             self.curr_iter = 0
         else:
@@ -325,7 +338,9 @@ class MultiAgentEnv(gym.Env):
         for i, agent in enumerate(self.agents.values()):
             agent.prev_energy = self._simulate_human(action_n[i], agent)
             obs_n.append(self._get_observation_per_agent(agent))
-            reward_n.append(self._get_reward_per_agent(agent))
+            reward_n.append(
+                self._get_reward_per_agent(agent, reward_function=self.reward_function)
+            )
             done_n.append(done)
             info_n["n"].append(
                 {}
@@ -384,7 +399,7 @@ class MultiAgentEnv(gym.Env):
     def reset(self):
         # reset world
         obs_n = []
-        for agent in self.agents:
+        for agent in self.agents.values():
             obs_n.append(self._get_observation_per_agent(agent))
         return obs_n
 

@@ -1,3 +1,4 @@
+import pdb
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
@@ -202,6 +203,14 @@ class DeterministicFunctionPerson(Person):
 
     def linear_response(self, points, day_of_week=None):
         points_effect = points * self.points_multiplier
+        if (
+            np.isnan(points_effect).any()
+            or np.isneginf(points_effect).any()
+            or np.isposinf(points_effect).any()
+        ):
+            import pdb
+
+            pdb.set_trace()
         output = self.routine_output_transform(points_effect, day_of_week=day_of_week)
         return output
 

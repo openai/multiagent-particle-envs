@@ -1,5 +1,3 @@
-import cvxpy as cvx
-
 # import osqp
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
@@ -35,6 +33,8 @@ class Reward:
         self.total_demand = np.sum(energy_use)
 
     def ideal_use_calculation(self):
+        import cvxpy as cvx
+
         """
 		Computes an optimization of demand according to price 
 
