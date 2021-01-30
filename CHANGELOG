@@ -1,0 +1,7 @@
+Changelog for the fork
+
+29 Jan 2021
+============
+
+rendering.py: removed reraise dependency.
+multi_discrete: replaced prng with numpy RandomState().rand()
