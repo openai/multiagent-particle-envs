@@ -8,7 +8,7 @@ class Scenario(BaseScenario):
         world = World()
         # set any world properties first
         world.dim_c = 2
-        num_agents = 3
+        num_agents = 1
         num_landmarks = 3
         world.collaborative = True
         # add agents

@@ -1,5 +1,3 @@
-**Status:** Archive (code is provided as-is, no updates expected)
-
 # Multi-Agent Particle Environment
 
 A simple multi-agent particle world with a continuous observation and discrete action space, along with some basic simulated physics.
@@ -9,8 +7,8 @@ Used in the paper [Multi-Agent Actor-Critic for Mixed Cooperative-Competitive En
 
 - To install, `cd` into the root directory and type `pip install -e .`
 
-- To interactively view moving to landmark scenario (see others in ./scenarios/):
-`bin/interactive.py --scenario simple.py`
+- To run a policy for a scenario (see others in ./scenarios/):
+`bin/run_policy.py --scenario simple_spread.py`
 
 - Known dependencies: Python (3.5.4), OpenAI gym (0.10.5), numpy (1.14.5)
 
@@ -24,9 +22,11 @@ Used in the paper [Multi-Agent Actor-Critic for Mixed Cooperative-Competitive En
 
 - `./multiagent/core.py`: contains classes for various objects (Entities, Landmarks, Agents, etc.) that are used throughout the code.
 
+- `./multiagent/policy/policy.py`: contains code for base policy class. Other files in the policy folder have different policies.
+
+
 - `./multiagent/rendering.py`: used for displaying agent behaviors on the screen.
 
-- `./multiagent/policy.py`: contains code for interactive policy based on keyboard input.
 
 - `./multiagent/scenario.py`: contains base scenario object that is extended for all scenarios.
 
@@ -38,6 +38,10 @@ Used in the paper [Multi-Agent Actor-Critic for Mixed Cooperative-Competitive En
     3) `reward()`: defines the reward function for a given agent
     4) `observation()`: defines the observation space of a given agent
     5) (optional) `benchmark_data()`: provides diagnostic data for policies trained on the environment (e.g. evaluation metrics)
+
+## Creating and running policies
+
+- `./multiagent/policy`: folder contains code for different policies. Name the file for the policy. To run, change instantiation in bin/run_policy.py and run it with the intended scenario.
 
 ### Creating new environments
 
