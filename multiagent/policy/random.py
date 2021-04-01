@@ -7,7 +7,7 @@ class RandomPolicy(Policy):
         self.env = env
     
     def action(self, obs):
+        # use observation
+
         u = int(np.random.random_integers(0,4))
-        # print(self.env.discrete_action_input)
-        # return np.concatenate([u, np.zeros(self.env.world.dim_c)])
         return u
