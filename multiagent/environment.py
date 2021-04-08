@@ -350,3 +350,114 @@ class BatchMultiAgentEnv(gym.Env):
         for env in self.env_batch:
             results_n += env.render(mode, close)
         return results_n
+
+
+# Multiagent environment for partial observability
+class PartialObsMAE(MultiAgentEnv):
+    def __init__(self,
+                world,
+                reset_callback=None,
+                reward_callback=None,
+                observation_callback=None,
+                info_callback=None,
+                done_callback=None,
+                shared_viewer=True,
+                noise_dist='gaussian',
+                history_len=10,
+                seed_rng=False):
+        super().__init__(world,
+                        reset_callback=reset_callback,
+                        reward_callback=reward_callback,
+                        observation_callback=observation_callback,
+                        info_callback=info_callback,
+                        done_callback=done_callback,
+                        shared_viewer=shared_viewer)
+        
+        self.rng = np.random.default_rng()
+        
+        self.history = []
+        
+        dists = ['gaussian', 'exponential', 'uniform']
+        if noise_dist is None:
+            raise ValueError(f"noise_dist must be one of {dists}")
+        
+        self.noise_dist = noise_dist.lower()
+        
+        if self.noise_dist not in dists:
+            raise ValueError("Try one of "+\
+                            f"{dists} dists")        
+        
+        if seed_rng:
+            np.random.seed(1337) # For reproducibililty
+
+        if history_len is not None:
+            self.history_len = history_len
+
+        self.noise_init(self.n, type=self.noise_dist)
+        
+    
+    def noise_init(self, agent_count, type='gaussian'):
+        self.noise_params = []
+        self.history = [[]]*self.n
+
+        if self.noise_dist=='gaussian':
+            for _ in range(self.n):
+                self.noise_params.append((self.rng.random(),
+                                          self.rng.random()))
+        
+        elif self.noise_dist=='uniform':
+            for _ in range(self.n):
+                self.noise_params.append((0.5*self.rng.random(),
+                                          0.5*self.rng.random()+1))
+        
+        elif self.noise_dist=='exponential':
+            for _ in range(self.n):
+                self.noise_params.append((0.5*self.rng.random()+1,))
+        
+        else:
+            raise NotImplementedError(f"{self.noise_dist} has not been implemented yet")
+
+        return self.noise_params
+
+    def noisyobs(self, obs_n):
+        if self.noise_dist == 'gaussian':
+            for i, obs in enumerate(obs_n):
+
+                obs_n[i] = obs+self.rng.normal(self.noise_params[i][0],
+                                               self.noise_params[i][1],
+                                               obs_n[i].shape)
+
+                self.history[i] = self.history[i][-self.history_len:]
+                self.history[i].append(obs_n[i])
+
+        elif self.noise_dist == 'uniform':
+            for i, obs in enumerate(obs_n):
+                obs_n[i] = obs+self.rng.uniform(self.noise_params[i][0],
+                                                self.noise_params[i][1],
+                                                obs_n[i].shape)
+                self.history[i] = self.history[i][-self.history_len:]
+                self.history[i].append(obs_n[i])
+        
+        elif self.noise_dist == 'exponential':
+            for i, obs in enumerate(obs_n):
+
+                obs_n[i] = obs+self.rng.exponential(self.noise_params[i][0],
+                                                    obs_n[i].shape)
+
+                self.history[i] = self.history[i][-self.history_len:]
+                self.history[i].append(obs_n[i])
+                
+        return obs_n
+
+    def step(self, action_n):
+        obs_n, reward_n, done_n, info_n = super().step(action_n)
+        obs_n = self.noisyobs(obs_n)
+
+        return obs_n, reward_n, done_n, info_n, self.history
+    
+    def reset(self):
+        self.history = []
+        self.noise_init(self.n, type=self.noise_dist)
+        obs_n = super().reset()
+        obs_n = self.noisyobs(obs_n)
+        return obs_n, self.history
