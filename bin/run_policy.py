@@ -21,10 +21,10 @@ if __name__ == '__main__':
     # create multiagent environment
 
     # fully observable env
-    # env = MultiAgentEnv(world, scenario.reset_world, scenario.reward, scenario.observation, info_callback=None, shared_viewer=False)
+    env = MultiAgentEnv(world, scenario.reset_world, scenario.reward, scenario.observation, info_callback=None, shared_viewer=False)
 
     #Partially observable env
-    env = PartialObsMAE(world, scenario.reset_world, scenario.reward, scenario.observation, info_callback=None, shared_viewer = False)
+    # env = PartialObsMAE(world, scenario.reset_world, scenario.reward, scenario.observation, info_callback=None, shared_viewer = False)
     # env.reset(), env.step() now gives back current state and history
     # 
 

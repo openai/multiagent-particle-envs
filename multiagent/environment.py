@@ -299,6 +299,9 @@ class MultiAgentEnv(gym.Env):
                     dx.append(np.array([x, y]))
         return dx
 
+    def sample_actions(self):
+        # Samples all agents iteratively
+        return [agent_action.sample() for agent_action in self.action_space]
 
 # vectorized wrapper for a batch of multi-agent environments
 # assumes all environments have the same observation and action space
