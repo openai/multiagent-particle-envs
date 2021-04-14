@@ -8,7 +8,7 @@ class Scenario(BaseScenario):
         world = World()
         # set any world properties first
         world.dim_c = 2
-        num_agents = 1
+        num_agents = 2
         num_landmarks = 3
         world.collaborative = True
         # add agents
@@ -74,7 +74,7 @@ class Scenario(BaseScenario):
         rew = 0
         for l in world.landmarks:
             dists = [np.sqrt(np.sum(np.square(a.state.p_pos - l.state.p_pos)))
-                     for a in world.agents]
+                     for a in world.agents] # if a.name == agent.name]
             rew -= min(dists)
         if agent.collide:
             for a in world.agents:
