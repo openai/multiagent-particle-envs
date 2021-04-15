@@ -58,7 +58,7 @@ class PolicyNet(nn.Module):
         # clamped to (-1,1)
         x = F.relu(self.linear1(state))
         x = F.relu(self.linear2(x))
-        x = torch.sigmoid(self.linear3(x)) 
+        x = torch.tanh(self.linear3(x)) 
         # print(x)
         return x
 
