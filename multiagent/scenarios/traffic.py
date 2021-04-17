@@ -9,7 +9,7 @@ class Scenario(BaseScenario):
         # set any world properties first
         world.dim_c = 0
         # First half will be vertical, second half will be horizontal
-        num_agents = 2
+        num_agents = 4
         # Make sure number of agents is even for now
         assert num_agents % 2 == 0
         num_adversaries = 0
@@ -18,7 +18,7 @@ class Scenario(BaseScenario):
         world.agents = [Agent() for i in range(num_agents)]
         for i, agent in enumerate(world.agents):
             agent.name = "agent %d" % i
-            agent.collide = True
+            agent.collide = False
             agent.silent = True
             if i < num_adversaries:
                 agent.adversary = True
@@ -40,8 +40,6 @@ class Scenario(BaseScenario):
     def reset_world(self, world):
         num_agents = len(world.agents)
         world.timer = 0
-        world.teleport_y = -np.inf
-        world.teleport_x = -np.inf
         world.shared_var = self.sample_z_normal()
         # random properties for landmarks
         for i, landmark in enumerate(world.landmarks):
@@ -84,8 +82,6 @@ class Scenario(BaseScenario):
                     )
                 agent.state.p_vel = np.zeros(world.dim_p)
                 agent.state.c = np.zeros(world.dim_c)
-                if agent.state.p_pos[1] > world.teleport_y:
-                    world.teleport_y = agent.state.p_pos[1]
             else:
                 agent.goal = world.landmarks[1]
                 # agent.state.p_pos = np.asarray([1.0, 0.0])
@@ -103,62 +99,31 @@ class Scenario(BaseScenario):
                     )
                 agent.state.p_vel = np.zeros(world.dim_p)
                 agent.state.c = np.zeros(world.dim_c)
-                if agent.state.p_pos[0] > world.teleport_x:
-                    world.teleport_x = agent.state.p_pos[0]
-
-    def dist_reward(self, agent, world):
-        # Agents are rewarded based on minimum agent distance to each landmark
-        num_agents = len(world.agents)
-
-        tol = 0.1
-        dist_to_goal = np.sum(np.square(agent.state.p_pos - agent.goal.state.p_pos))
-        reward = 0
-        reached_goal = False
-
-        if self.is_collision(world.agents[0], world.agents[1]):
-            reward -= 200
-
-        # Agent 0 is going vertically (top to bottom)
-        if int(agent.name.split(" ")[-1]) < num_agents / 2:
-            if np.abs(agent.state.p_pos[0]) > tol:
-                reward -= 200
-
-            if agent.state.p_pos[1] <= agent.goal.state.p_pos[1]:
-                reward += 10
-                reached_goal = True
-
-        # Agent 1 is going horizontally (right to left)
-        else:
-            if np.abs(agent.state.p_pos[1]) > tol:
-                reward -= 200
-            if agent.state.p_pos[0] <= agent.goal.state.p_pos[0]:
-                reward += 10
-                reached_goal = True
-
-        if not reached_goal:
-            reward -= 1.0 + dist_to_goal
-
-        return reward
 
     def reward(self, agent, world):
         # Agents are rewarded based on minimum agent distance to each landmark
         num_agents = len(world.agents)
+        dist_to_goal = np.sum(np.square(agent.state.p_pos - agent.goal.state.p_pos))
+        tol = 0.2
+        reward = 0 - dist_to_goal * 0.01
 
-        tol = 0.1
-        reward = 0
-
+        max_y = 0.5
+        max_x = 0.5
         for i, agent_i in enumerate(world.agents):
+            if agent_i.state.p_pos[1] > max_y:
+                max_y = agent_i.state.p_pos[1]
+
+            if agent_i.state.p_pos[0] > max_x:
+                max_x = agent_i.state.p_pos[0]
+
             if agent_i == agent:
                 continue
 
             if self.is_collision(agent, agent_i):
-                reward -= 1000
+                reward -= 500
 
         # Agent 0 is going vertically (top to bottom)
         if int(agent.name.split(" ")[-1]) < num_agents / 2:
-            # Agent should have negative velocity (e.g. up to down) to reach goal
-            reward -= agent.state.p_vel[1]
-
             # If vertical agent moves horizontally, penalize
             if np.abs(agent.state.p_pos[0]) > tol:
                 reward -= 500
@@ -167,25 +132,22 @@ class Scenario(BaseScenario):
             if agent.state.p_pos[1] <= agent.goal.state.p_pos[1]:
                 reward += 10
                 # Teleport after reaching goal
-                agent.state.p_pos = np.asarray([0.0, world.teleport_y])
-            # print("vertical reward: ", reward)
+                # First get agent with highest y
+                offset = np.random.exponential(scale=1 / 5)
+                teleport_y = max_y + offset
+                agent.state.p_pos = np.asarray([0.0, teleport_y])
 
         # Agent 1 is going horizontally (right to left)
         else:
-            reward -= agent.state.p_vel[0]
-            print('--------------------')
-            print('horizontal: ', agent.state.p_vel)
-            print('vel reward: ', reward)
-            # If horizontal agent moves horizontally, penalize
             if np.abs(agent.state.p_pos[1]) > tol:
                 reward -= 500
 
             if agent.state.p_pos[0] <= agent.goal.state.p_pos[0]:
                 reward += 10
                 # Teleport after reaching goal
-                agent.state.p_pos = np.asarray([world.teleport_x, 0.0])
-            # print("horizontal reward: ", reward)
-            print('-------------------------')
+                offset = np.random.exponential(scale=1 / 5)
+                teleport_x = max_x + offset
+                agent.state.p_pos = np.asarray([teleport_x, 0.0])
 
         return reward
 
