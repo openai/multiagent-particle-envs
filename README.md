@@ -1,6 +1,6 @@
 **Status:** Archive (code is provided as-is, no updates expected)
 
-A maintained version of these environments, with numerous fixes, is included with PettingZoo (https://github.com/PettingZoo-Team/PettingZoo , https://www.pettingzoo.ml/mpe)
+A maintained version of these environments, with numerous fixes, is included with PettingZoo (https://github.com/Farama-Foundation/PettingZoo , https://www.pettingzoo.ml/mpe)
 
 # Multi-Agent Particle Environment
 
