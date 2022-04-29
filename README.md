@@ -9,12 +9,16 @@ Used in the paper [Multi-Agent Actor-Critic for Mixed Cooperative-Competitive En
 
 ## Getting started:
 
+- Supported platforms: Mac and Linux with Python 3.5.4, check `python --version` to make sure you have the correct version of python installed.
+
+  - If you're using [miniconda](https://docs.conda.io/en/latest/miniconda.html) (recommended) you can create an environment with `conda create --name multiagent-particle-envs python=3.5.4`
+
+  - This release requires `gym==0.10.5`, for newer versions of gym try using [jarbus's fork of this repo](https://github.com/jarbus/multiagent-particle-envs/tree/pullreq) instead
+
 - To install, `cd` into the root directory and type `pip install -e .`
 
 - To interactively view moving to landmark scenario (see others in ./scenarios/):
 `bin/interactive.py --scenario simple.py`
-
-- Known dependencies: Python (3.5.4), OpenAI gym (0.10.5), numpy (1.14.5)
 
 - To use the environments, look at the code for importing them in `make_env.py`.
 
