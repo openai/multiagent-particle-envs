@@ -22,4 +22,4 @@ warnings.warn("This code base is no longer maintained, and is not expected to be
 'For the past handful of years, these environments been maintained inside of PettingZoo (see https://pettingzoo.farama.org/environments/mpe/ \n).' \
 'This maintained version includes documentation, support for the PettingZoo API, support for current versions of Python, numerous bug fixes, \n'' \
 'support for installation via pip, and numerous other large quality of life improvements. We encourage researchers to consider switching to this \n' \
-'version for any purposes other than comparing to results run on this version of the environments.'
+'version for any purposes other than comparing to results run on this version of the environments.')
