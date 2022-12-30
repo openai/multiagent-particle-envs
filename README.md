@@ -1,6 +1,8 @@
 **Status:** Archive (code is provided as-is, no updates expected)
 
-A maintained version of these environments, with numerous fixes, is included with PettingZoo (https://github.com/Farama-Foundation/PettingZoo , https://www.pettingzoo.ml/mpe)
+# Maintained Fork
+
+The maintained version of these environments, which includes numerous fixes, comprehensive documentation, installation via pip, and support for current versions of Python is included with PettingZoo (https://github.com/Farama-Foundation/PettingZoo , https://pettingzoo.farama.org/environments/mpe/)
 
 # Multi-Agent Particle Environment
 
