@@ -26,3 +26,4 @@ warnings.warn("This code base is no longer maintained, and is not expected to be
               "support for installation via pip, and numerous other large quality of life improvements. \nWe "
               "encourage researchers to switch to this maintained version for all purposes other than comparing "
               "to results run on this version of the environments. \n")
+input("Please read the raised warning, then press Enter to continue...\n")
