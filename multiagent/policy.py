@@ -1,6 +1,8 @@
 import numpy as np
 from pyglet.window import key
 
+from multiagent.scenarios.simple import Scenario
+
 # individual agent policy
 class Policy(object):
     def __init__(self):
@@ -14,6 +16,7 @@ class InteractivePolicy(Policy):
     def __init__(self, env, agent_index):
         super(InteractivePolicy, self).__init__()
         self.env = env
+        #self.agent_index = agent_index
         # hard-coded keyboard events
         self.move = [False for i in range(4)]
         self.comm = [False for i in range(env.world.dim_c)]
