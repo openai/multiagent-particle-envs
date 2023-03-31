@@ -2,7 +2,7 @@
 
 # Maintained Fork
 
-The maintained version of these environments, which includenumerous fixes, comprehensive documentation, support for installation via pip, and support for current versions of Python are available in PettingZoo (https://github.com/Farama-Foundation/PettingZoo , https://pettingzoo.farama.org/environments/mpe/)
+The maintained version of these environments, which include numerous fixes, comprehensive documentation, support for installation via pip, and support for current versions of Python are available in PettingZoo (https://github.com/Farama-Foundation/PettingZoo , https://pettingzoo.farama.org/environments/mpe/)
 
 # Multi-Agent Particle Environment
 
