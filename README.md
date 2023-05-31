@@ -1,6 +1,7 @@
-**Status:** Archive (code is provided as-is, no updates expected)
+**Status:** Experimenting with generated open world like metaverses. 
+Contributers are free to add custom metaverses and evals to the code.
 
-# Maintained Fork
+# Experimental Fork
 
 The maintained version of these environments, which includenumerous fixes, comprehensive documentation, support for installation via pip, and support for current versions of Python are available in PettingZoo (https://github.com/Farama-Foundation/PettingZoo , https://pettingzoo.farama.org/environments/mpe/)
 
