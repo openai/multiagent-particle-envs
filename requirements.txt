@@ -1,0 +1,12 @@
+cloudpickle==3.0.0
+gym==0.26.2
+gym-notices==0.0.8
+numpy==1.26.2
+numpy-stl==3.1.1
+pip==23.3.1
+pyglet==1.5.27
+setuptools==68.0.0
+six==1.16.0
+typing-extensions==4.8.0
+wheel==0.41.2
+
