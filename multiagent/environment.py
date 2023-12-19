@@ -42,7 +42,9 @@ class MultiAgentEnv(gym.Env):
             total_action_space = []
             # physical action space
             if self.discrete_action_space:
-                u_action_space = spaces.Discrete(world.dim_p * 2 + 1)
+                # ADDING 1 TO DIM_P FOR TORQUE (dont want to change dim_p to avoid confusion with cartesian dimension)
+                u_action_space = spaces.Discrete((world.dim_p + 1) * 2 + 1)
+                print("SETTING DISCRETE ACTION SPACE")
             else:
                 u_action_space = spaces.Box(low=-agent.u_range, high=+agent.u_range, shape=(world.dim_p,), dtype=np.float32)
             if agent.movable:
@@ -67,6 +69,7 @@ class MultiAgentEnv(gym.Env):
             # observation space
             obs_dim = len(observation_callback(agent, self.world))
             self.observation_space.append(spaces.Box(low=-np.inf, high=+np.inf, shape=(obs_dim,), dtype=np.float32))
+            print(self.observation_space)
             agent.action.c = np.zeros(self.world.dim_c)
 
         # rendering
@@ -96,6 +99,7 @@ class MultiAgentEnv(gym.Env):
 
             info_n['n'].append(self._get_info(agent))
 
+        
         # all agents get total reward in cooperative case
         reward = np.sum(reward_n)
         if self.shared_reward:
@@ -142,7 +146,8 @@ class MultiAgentEnv(gym.Env):
 
     # set env action for a particular agent
     def _set_action(self, action, agent, action_space, time=None):
-        agent.action.u = np.zeros(self.world.dim_p)
+        # ADDED 1 FOR TORQUE
+        agent.action.u = np.zeros(self.world.dim_p + 1)
         agent.action.c = np.zeros(self.world.dim_c)
         # process action
         if isinstance(action_space, MultiDiscrete):
@@ -173,6 +178,8 @@ class MultiAgentEnv(gym.Env):
                 if self.discrete_action_space:
                     agent.action.u[0] += action[0][1] - action[0][2]
                     agent.action.u[1] += action[0][3] - action[0][4]
+                    # ADDING TORQUE ACTIONS
+                    agent.action.u[2] += action[0][5] - action[0][6]
                 else:
                     agent.action.u = action[0]
             sensitivity = 5.0
@@ -210,7 +217,7 @@ class MultiAgentEnv(gym.Env):
                     else:
                         word = alphabet[np.argmax(other.state.c)]
                     message += (other.name + ' to ' + agent.name + ': ' + word + '   ')
-            print(message)
+            # print(message)
 
         for i in range(len(self.viewers)):
             # create viewers (if necessary)
@@ -227,12 +234,25 @@ class MultiAgentEnv(gym.Env):
             from multiagent import rendering
             self.render_geoms = []
             self.render_geoms_xform = []
+            self.agent_direction_lines = []
+
             for entity in self.world.entities:
+                if 'obstacle' in entity.name:
+                    continue
                 geom = rendering.make_circle(entity.size)
                 xform = rendering.Transform()
                 if 'agent' in entity.name:
                     geom.set_color(*entity.color, alpha=0.5)
-                else:
+
+                    # Directional indicator for the agent
+                    line = rendering.Line((0, 0), (entity.vision_dist, 0))
+                    line.set_color(1, 0, 0)
+                    line_xform = rendering.Transform()
+                    line.add_attr(line_xform)
+                    line.add_attr(xform)
+                    self.agent_direction_lines.append(line)  # Store the line
+
+                elif 'landmark' in entity.name:
                     geom.set_color(*entity.color)
                 geom.add_attr(xform)
                 self.render_geoms.append(geom)
@@ -243,6 +263,8 @@ class MultiAgentEnv(gym.Env):
                 viewer.geoms = []
                 for geom in self.render_geoms:
                     viewer.add_geom(geom)
+                for line in self.agent_direction_lines:  # Add lines separately
+                    viewer.add_geom(line)
 
         results = []
         for i in range(len(self.viewers)):
@@ -255,11 +277,63 @@ class MultiAgentEnv(gym.Env):
                 pos = self.agents[i].state.p_pos
             self.viewers[i].set_bounds(pos[0]-cam_range,pos[0]+cam_range,pos[1]-cam_range,pos[1]+cam_range)
             # update geometry positions
+            line_index = 0
             for e, entity in enumerate(self.world.entities):
+                if 'obstacle' in entity.name:
+                    continue
                 self.render_geoms_xform[e].set_translation(*entity.state.p_pos)
+                
+                if 'agent' in entity.name:
+                    # Update the rotation of the directional line for this agent
+                    line = self.agent_direction_lines[line_index]
+
+                    line.attrs[2].set_rotation(entity.state.p_angle)  # attrs[0] is the line_xform
+                    line_index += 1
             # render to display or array
             results.append(self.viewers[i].render(return_rgb_array = mode=='rgb_array'))
+        # Check for the existence of the grid and render it if it exists
+        if hasattr(self.world, 'grid'):
+            max_grid_value = np.max(self.world.grid)
+            grid_size = len(self.world.grid)
+            for i in range(grid_size):
+                for j in range(grid_size):
+                    # Calculate grid square position and size
+                    grid_x = (i / grid_size) * self.world.dim_p - self.world.dim_p/2
+                    grid_y = (j / grid_size) * self.world.dim_p - self.world.dim_p/2
+                    grid_square_size = (self.world.dim_p / grid_size)
 
+                    # Create a square geometry for each grid cell
+                    from multiagent import rendering
+                    grid_square = rendering.FilledPolygon([
+                        (grid_x, grid_y),
+                        (grid_x + grid_square_size, grid_y),
+                        (grid_x + grid_square_size, grid_y + grid_square_size),
+                        (grid_x, grid_y + grid_square_size)
+                    ])
+
+                    # Set the color based on grid value (darker for higher values)
+                    grid_value = self.world.grid[i, j] / max_grid_value
+                    grid_square.set_color(0, 0, 0, alpha=grid_value)  # Using black with varying alpha
+
+                    # Add the grid square to the viewer
+                    for viewer in self.viewers:
+                        viewer.add_onetime(grid_square)
+            # Render obstacles
+
+        # Render obstacles
+        for obstacle in self.world.obstacles:
+            from multiagent import rendering
+            # Calculate the corners of the rectangle
+            x, y = obstacle.state.p_pos
+            dx, dy = obstacle.width / 2, obstacle.height / 2
+            corners = [(x-dx, y-dy), (x-dx, y+dy), (x+dx, y+dy), (x+dx, y-dy)]
+
+            # Create the rectangle
+            obstacle_geom = rendering.make_polygon(corners)
+            obstacle_geom.set_color(*obstacle.color)  # Red color
+            for viewer in self.viewers:
+                viewer.add_onetime(obstacle_geom)
+        
         return results
 
     # create receptor field locations in local coordinate frame
